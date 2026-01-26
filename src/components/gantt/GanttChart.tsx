@@ -12,8 +12,8 @@ export function GanttChart() {
       <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
         <GanttHeader />
         <div className="flex flex-1 overflow-hidden">
-          <GanttTimeline />
           <GanttTaskList />
+          <GanttTimeline />
         </div>
         <TaskForm />
       </div>

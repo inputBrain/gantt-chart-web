@@ -8,12 +8,23 @@ export function GanttTaskList() {
   const { state, selectTask, openForm, deleteTask } = useGantt();
 
   return (
-    <div className="w-80 flex-shrink-0 border-l border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50">
+    <div className="w-80 flex-shrink-0 border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50">
       <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Tasks</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Tasks</h2>
+          <button
+            onClick={() => openForm()}
+            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Task
+          </button>
+        </div>
       </div>
 
-      <div className="h-[calc(100%-49px)] overflow-auto">
+      <div className="h-[calc(100%-57px)] overflow-auto">
         {state.tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <svg
