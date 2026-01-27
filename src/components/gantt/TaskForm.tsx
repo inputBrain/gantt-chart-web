@@ -50,7 +50,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
   };
 
   const handleDelete = () => {
-    if (editingTask && confirm('Are you sure you want to delete this task?')) {
+    if (editingTask && confirm('Delete this task?')) {
       deleteTask(editingTask.id);
     }
   };
@@ -64,55 +64,59 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
   const availableDependencies = tasks.filter((t) => !editingTask || t.id !== editingTask.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white shadow-xl dark:bg-zinc-800">
-        <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-4 dark:border-zinc-700">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            {editingTask ? 'Edit Task' : 'Add Task'}
-          </h2>
-          <button
-            onClick={closeForm}
-            className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl">
+        {/* Header */}
+        <div className="border-b border-neutral-200 bg-neutral-50 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-neutral-800">
+              {editingTask ? 'Edit Task' : 'New Task'}
+            </h2>
+            <button
+              onClick={closeForm}
+              className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
             {/* Task Name */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Task Name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-100 dark:placeholder-zinc-500"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
                 placeholder="Enter task name"
                 required
+                autoFocus
               />
             </div>
 
             {/* Dates */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-100"
+                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
                   required
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                   End Date
                 </label>
                 <input
@@ -120,7 +124,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   min={startDate}
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-100"
+                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
                   required
                 />
               </div>
@@ -128,19 +132,18 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
 
             {/* Color */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Color
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2">
                 {COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    className={`h-8 w-8 rounded-full transition-transform ${TASK_COLORS[c].progress} ${
-                      color === c ? 'scale-110 ring-2 ring-offset-2 ring-zinc-400 dark:ring-offset-zinc-800' : 'hover:scale-105'
+                    className={`h-8 w-8 rounded-full shadow-sm ${TASK_COLORS[c].progress} ${
+                      color === c ? 'ring-2 ring-neutral-400 ring-offset-2 scale-110' : 'hover:scale-110'
                     }`}
-                    title={c.charAt(0).toUpperCase() + c.slice(1)}
                   />
                 ))}
               </div>
@@ -149,23 +152,23 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
             {/* Dependencies */}
             {availableDependencies.length > 0 && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                   Dependencies
                 </label>
-                <div className="max-h-32 space-y-1 overflow-auto rounded-lg border border-zinc-200 p-2 dark:border-zinc-600">
+                <div className="max-h-32 space-y-1 overflow-auto rounded-xl border border-neutral-200 bg-neutral-50 p-2">
                   {availableDependencies.map((task) => (
                     <label
                       key={task.id}
-                      className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 hover:bg-white"
                     >
                       <input
                         type="checkbox"
                         checked={dependsOn.includes(task.id)}
                         onChange={() => handleDependencyToggle(task.id)}
-                        className="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                        className="h-4 w-4 rounded border-neutral-300 text-cyan-500 focus:ring-cyan-400"
                       />
-                      <div className={`h-2 w-2 rounded-full ${TASK_COLORS[task.color].progress}`} />
-                      <span className="text-sm text-zinc-700 dark:text-zinc-300">{task.name}</span>
+                      <div className={`h-2.5 w-2.5 rounded-full ${TASK_COLORS[task.color].progress}`} />
+                      <span className="text-sm text-neutral-700">{task.name}</span>
                     </label>
                   ))}
                 </div>
@@ -180,9 +183,9 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                  className="rounded-lg px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-50"
                 >
-                  Delete
+                  Delete Task
                 </button>
               )}
             </div>
@@ -190,15 +193,15 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
               <button
                 type="button"
                 onClick={closeForm}
-                className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                className="rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="rounded-xl bg-neutral-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-neutral-800"
               >
-                {editingTask ? 'Save Changes' : 'Add Task'}
+                {editingTask ? 'Save Changes' : 'Create Task'}
               </button>
             </div>
           </div>

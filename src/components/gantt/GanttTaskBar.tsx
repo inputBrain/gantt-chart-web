@@ -36,37 +36,37 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
   return (
     <div
-      className={`group absolute flex cursor-pointer items-center rounded-md border-2 transition-shadow ${colors.bg} ${colors.border} ${
-        isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+      className={`group absolute flex cursor-pointer items-center rounded-lg ${colors.bg} shadow-sm ${
+        isSelected ? 'ring-2 ring-cyan-400 ring-offset-1 shadow-md' : ''
       } ${isDragging ? 'shadow-lg' : 'hover:shadow-md'}`}
       style={{
         left: Math.max(0, position.left),
         width: Math.min(position.width, config.totalWidth - position.left),
-        top: position.top + 8,
-        height: 34,
+        top: position.top + 10,
+        height: 30,
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
       {/* Left resize handle */}
       <div
-        className={`absolute -left-1 top-0 h-full w-3 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
+        className={`absolute -left-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
           isDragging && dragType === 'left' ? 'opacity-100' : ''
         }`}
         onMouseDown={handleLeftHandleMouseDown}
       >
-        <div className="absolute left-1 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-zinc-400" />
+        <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
       </div>
 
       {/* Progress bar */}
       <div
-        className={`absolute left-0 top-0 h-full rounded-l-md ${colors.progress} transition-all`}
-        style={{ width: `${progress}%`, opacity: 0.5 }}
+        className={`absolute left-0 top-0 h-full rounded-l-lg ${colors.progress}`}
+        style={{ width: `${progress}%`, opacity: 0.35 }}
       />
 
       {/* Task name */}
       <div
-        className="relative z-10 flex-1 truncate px-2 text-sm font-medium text-zinc-900 dark:text-zinc-100"
+        className="relative z-10 flex-1 truncate px-2.5 text-xs font-semibold text-neutral-800"
         onMouseDown={handleBarMouseDown}
       >
         {task.name}
@@ -74,12 +74,12 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
       {/* Right resize handle */}
       <div
-        className={`absolute -right-1 top-0 h-full w-3 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
+        className={`absolute -right-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
           isDragging && dragType === 'right' ? 'opacity-100' : ''
         }`}
         onMouseDown={handleRightHandleMouseDown}
       >
-        <div className="absolute right-1 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-zinc-400" />
+        <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
       </div>
     </div>
   );

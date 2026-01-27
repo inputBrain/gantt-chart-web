@@ -146,6 +146,7 @@ interface GanttContextValue {
   deleteTask: (id: string) => void;
   setViewMode: (mode: ViewMode) => void;
   navigate: (direction: 'prev' | 'next') => void;
+  goToToday: () => void;
   selectTask: (id: string | null) => void;
   openForm: (task?: Task) => void;
   closeForm: () => void;
@@ -187,6 +188,10 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'NAVIGATE', payload: direction });
   }, []);
 
+  const goToToday = useCallback(() => {
+    dispatch({ type: 'SET_CURRENT_DATE', payload: new Date() });
+  }, []);
+
   const selectTask = useCallback((id: string | null) => {
     dispatch({ type: 'SELECT_TASK', payload: id });
   }, []);
@@ -207,6 +212,7 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     deleteTask,
     setViewMode,
     navigate,
+    goToToday,
     selectTask,
     openForm,
     closeForm,

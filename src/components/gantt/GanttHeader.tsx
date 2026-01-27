@@ -5,34 +5,42 @@ import { getHeaderLabel } from '@/utils/dateUtils';
 import { ViewMode } from '@/types/gantt';
 
 export function GanttHeader() {
-  const { state, setViewMode, navigate } = useGantt();
+  const { state, setViewMode, navigate, goToToday } = useGantt();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
   };
 
   return (
-    <div className="relative flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Gantt Chart</h1>
+    <div className="flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-3">
+      {/* Left: Logo & View Mode */}
+      <div className="flex items-center gap-5">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900">
+            <svg className="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h1 className="text-base font-bold text-neutral-800">Gantt</h1>
+        </div>
 
-        <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+        <div className="flex items-center rounded-lg bg-neutral-100 p-1">
           <button
             onClick={() => handleViewModeChange('month')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
               state.viewMode === 'month'
-                ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
-                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                ? 'bg-white text-neutral-900 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-800'
             }`}
           >
             Month
           </button>
           <button
             onClick={() => handleViewModeChange('year')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
               state.viewMode === 'year'
-                ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
-                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                ? 'bg-white text-neutral-900 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-800'
             }`}
           >
             Year
@@ -40,33 +48,44 @@ export function GanttHeader() {
         </div>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+      {/* Center: Today + Navigation */}
+      <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate('prev')}
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
-          aria-label="Previous"
+          onClick={goToToday}
+          className="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700 hover:bg-cyan-100"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          Today
         </button>
 
-        <span className="min-w-[140px] text-center text-sm font-medium text-zinc-900 dark:text-zinc-100">
-          {getHeaderLabel(state.currentDate, state.viewMode)}
-        </span>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate('prev')}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-        <button
-          onClick={() => navigate('next')}
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
-          aria-label="Next"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+          <div className="flex min-w-[150px] items-center justify-center rounded-lg border border-neutral-200 bg-white px-4 py-2">
+            <span className="text-sm font-semibold tabular-nums text-neutral-800">
+              {getHeaderLabel(state.currentDate, state.viewMode)}
+            </span>
+          </div>
+
+          <button
+            onClick={() => navigate('next')}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <div />
+      {/* Right: empty for balance */}
+      <div className="w-[180px]" />
     </div>
   );
 }
