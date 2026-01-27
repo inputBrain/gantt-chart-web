@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { getTimelineConfig, isWeekend, isToday, getDaysInMonth, getTaskPosition } from '@/utils/dateUtils';
 import { GanttTaskBar } from './GanttTaskBar';
@@ -11,10 +11,36 @@ const HEADER_HEIGHT = 52;
 
 export function GanttTimeline() {
   const { state } = useGantt();
-  const config = useMemo(
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const handleResize = useCallback(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.clientWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+    const ro = new ResizeObserver(handleResize);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, [handleResize]);
+
+  const baseConfig = useMemo(
     () => getTimelineConfig(state.currentDate, state.viewMode),
     [state.currentDate, state.viewMode]
   );
+
+  const config = useMemo(() => {
+    if (!containerWidth || containerWidth <= baseConfig.totalWidth) return baseConfig;
+    const scale = containerWidth / baseConfig.totalWidth;
+    return {
+      ...baseConfig,
+      pixelsPerDay: baseConfig.pixelsPerDay * scale,
+      totalWidth: containerWidth,
+    };
+  }, [baseConfig, containerWidth]);
 
   const taskPositions = useMemo(() => {
     return state.tasks.map((task, index) => ({
@@ -26,7 +52,7 @@ export function GanttTimeline() {
   const timelineHeight = Math.max(state.tasks.length * ROW_HEIGHT, 400);
 
   return (
-    <div className="relative flex-1 overflow-auto bg-white">
+    <div ref={containerRef} className="relative flex-1 overflow-auto bg-white">
       <div
         className="relative"
         style={{ minWidth: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
@@ -47,7 +73,7 @@ export function GanttTimeline() {
                     className={`flex flex-col items-center justify-center border-r border-neutral-200 ${
                       weekend ? 'bg-neutral-100/70' : ''
                     } ${today ? 'bg-cyan-50' : ''}`}
-                    style={{ width: config.pixelsPerDay, minWidth: config.pixelsPerDay }}
+                    style={{ flex: `0 0 ${config.pixelsPerDay}px`, minWidth: config.pixelsPerDay }}
                   >
                     <span className={`text-[10px] font-semibold uppercase tracking-wider ${
                       today ? 'text-cyan-600' : 'text-neutral-400'
@@ -77,7 +103,7 @@ export function GanttTimeline() {
                     className={`flex items-center justify-center border-r border-neutral-200 ${
                       isCurrentMonth ? 'bg-cyan-50/50' : ''
                     }`}
-                    style={{ width: monthWidth, minWidth: monthWidth }}
+                    style={{ flex: `0 0 ${monthWidth}px`, minWidth: monthWidth }}
                   >
                     <span className={`text-xs font-bold ${isCurrentMonth ? 'text-cyan-700' : 'text-neutral-700'}`}>
                       {col.label}
