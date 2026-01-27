@@ -1,8 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
+  --background: #0b0e11;
+  --foreground: #eaecef;
+  --surface: #1e2329;
+  --surface-hover: #2b3139;
+  --border: #2b3139;
+  --border-light: #363c45;
+  --text-primary: #eaecef;
+  --text-secondary: #848e9c;
+  --text-tertiary: #5e6673;
+  --accent: #f0b90b;
+  --accent-hover: #d4a30a;
+  --accent-dim: rgba(240, 185, 11, 0.12);
+  --green: #0ecb81;
+  --red: #f6465d;
 }
 
 @theme inline {
@@ -19,34 +31,45 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Clean scrollbar */
+/* Dark scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: #181a20;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: #363c45;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
+  background: #5e6673;
 }
 
-/* Subtle neon focus */
+/* Simple focus — no cascading animations */
 *:focus-visible {
-  outline: 2px solid #06b6d4;
-  outline-offset: 2px;
+  outline: 1px solid #f0b90b;
+  outline-offset: 0px;
 }
 
-/* Smooth transitions */
-button, a, input, select {
-  transition: all 0.15s ease;
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: #f0b90b !important;
+  box-shadow: none !important;
+}
+
+/* No transitions on inputs */
+button, a {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+input, select {
+  transition: border-color 0.1s ease;
 }
 
 .tabular-nums {

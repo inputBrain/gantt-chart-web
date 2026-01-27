@@ -26,15 +26,15 @@ export function GanttTimeline() {
   const timelineHeight = Math.max(state.tasks.length * ROW_HEIGHT, 400);
 
   return (
-    <div className="relative flex-1 overflow-auto bg-white">
+    <div className="relative flex-1 overflow-auto rounded-lg border" style={{ background: '#0b0e11', borderColor: '#2b3139' }}>
       <div
         className="relative"
         style={{ width: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
       >
         {/* Header */}
         <div
-          className="sticky top-0 z-20 border-b border-neutral-200 bg-neutral-50"
-          style={{ height: HEADER_HEIGHT }}
+          className="sticky top-0 z-20 border-b"
+          style={{ height: HEADER_HEIGHT, background: '#1e2329', borderColor: '#2b3139' }}
         >
           <div className="flex h-full">
             {state.viewMode === 'month' ? (
@@ -44,22 +44,29 @@ export function GanttTimeline() {
                 return (
                   <div
                     key={idx}
-                    className={`flex flex-col items-center justify-center border-r border-neutral-200 ${
-                      weekend ? 'bg-neutral-100/70' : ''
-                    } ${today ? 'bg-cyan-50' : ''}`}
-                    style={{ width: config.pixelsPerDay, minWidth: config.pixelsPerDay }}
+                    className="flex flex-col items-center justify-center border-r"
+                    style={{
+                      width: config.pixelsPerDay,
+                      minWidth: config.pixelsPerDay,
+                      borderColor: '#2b3139',
+                      background: today ? 'rgba(240, 185, 11, 0.08)' : weekend ? '#181a20' : undefined,
+                    }}
                   >
-                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${
-                      today ? 'text-cyan-600' : 'text-neutral-400'
-                    }`}>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider" style={{
+                      color: today ? '#f0b90b' : '#5e6673'
+                    }}>
                       {['S', 'M', 'T', 'W', 'T', 'F', 'S'][col.date.getDay()]}
                     </span>
                     <span
                       className={`text-xs font-bold tabular-nums ${
                         today
-                          ? 'flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500 text-white'
-                          : 'text-neutral-700'
+                          ? 'flex h-6 w-6 items-center justify-center rounded-full'
+                          : ''
                       }`}
+                      style={today
+                        ? { background: '#f0b90b', color: '#0b0e11' }
+                        : { color: '#eaecef' }
+                      }
                     >
                       {col.label}
                     </span>
@@ -74,12 +81,15 @@ export function GanttTimeline() {
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center justify-center border-r border-neutral-200 ${
-                      isCurrentMonth ? 'bg-cyan-50/50' : ''
-                    }`}
-                    style={{ width: monthWidth, minWidth: monthWidth }}
+                    className="flex items-center justify-center border-r"
+                    style={{
+                      width: monthWidth,
+                      minWidth: monthWidth,
+                      borderColor: '#2b3139',
+                      background: isCurrentMonth ? 'rgba(240, 185, 11, 0.06)' : undefined,
+                    }}
                   >
-                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-cyan-700' : 'text-neutral-700'}`}>
+                    <span className="text-xs font-bold" style={{ color: isCurrentMonth ? '#f0b90b' : '#eaecef' }}>
                       {col.label}
                     </span>
                   </div>
@@ -100,13 +110,13 @@ export function GanttTimeline() {
                   return (
                     <div
                       key={idx}
-                      className={`absolute top-0 border-r border-neutral-100 ${
-                        weekend ? 'bg-neutral-50/70' : ''
-                      } ${today ? 'bg-cyan-50/30' : ''}`}
+                      className="absolute top-0 border-r"
                       style={{
                         left: idx * config.pixelsPerDay,
                         width: config.pixelsPerDay,
                         height: timelineHeight,
+                        borderColor: '#181a20',
+                        background: today ? 'rgba(240, 185, 11, 0.04)' : weekend ? 'rgba(24, 26, 32, 0.5)' : undefined,
                       }}
                     />
                   );
@@ -120,11 +130,12 @@ export function GanttTimeline() {
                   return (
                     <div
                       key={idx}
-                      className="absolute top-0 border-r border-neutral-200"
+                      className="absolute top-0 border-r"
                       style={{
                         left: offset,
                         width: daysInMonth * config.pixelsPerDay,
                         height: timelineHeight,
+                        borderColor: '#2b3139',
                       }}
                     />
                   );
@@ -136,8 +147,8 @@ export function GanttTimeline() {
             {state.tasks.map((_, idx) => (
               <div
                 key={idx}
-                className="absolute left-0 right-0 border-b border-neutral-100"
-                style={{ top: (idx + 1) * ROW_HEIGHT }}
+                className="absolute left-0 right-0 border-b"
+                style={{ top: (idx + 1) * ROW_HEIGHT, borderColor: '#181a20' }}
               />
             ))}
           </div>

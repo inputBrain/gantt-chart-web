@@ -43,8 +43,8 @@ export function GanttDependencyArrows({ tasks, config, rowHeight, timelineHeight
 
   return (
     <svg
-      className="pointer-events-none absolute left-0 top-0 text-violet-400"
-      style={{ width: config.totalWidth, height: timelineHeight }}
+      className="pointer-events-none absolute left-0 top-0"
+      style={{ color: '#f0b90b', width: config.totalWidth, height: timelineHeight }}
     >
       <defs>
         <marker

@@ -9,9 +9,9 @@ import { TaskForm } from './TaskForm';
 export function GanttChart() {
   return (
     <GanttProvider>
-      <div className="flex h-screen flex-col bg-neutral-50">
+      <div className="flex h-screen flex-col" style={{ background: '#0b0e11' }}>
         <GanttHeader />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden px-3 pb-3 gap-3">
           <GanttTaskList />
           <GanttTimeline />
         </div>
