@@ -29,7 +29,7 @@ export function GanttTimeline() {
     <div className="relative flex-1 overflow-auto bg-white">
       <div
         className="relative"
-        style={{ width: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
+        style={{ minWidth: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
       >
         {/* Header */}
         <div
@@ -141,6 +141,30 @@ export function GanttTimeline() {
               />
             ))}
           </div>
+
+          {/* Today indicator line */}
+          {(() => {
+            const today = new Date();
+            const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const timelineStart = new Date(config.startDate.getFullYear(), config.startDate.getMonth(), config.startDate.getDate());
+            const daysFromStart = Math.round((todayNormalized.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
+            const todayX = daysFromStart * config.pixelsPerDay + config.pixelsPerDay / 2;
+            if (todayX >= 0 && todayX <= config.totalWidth) {
+              return (
+                <div
+                  className="pointer-events-none absolute z-10"
+                  style={{
+                    left: todayX,
+                    top: 0,
+                    width: 2,
+                    height: timelineHeight,
+                    backgroundColor: '#06b6d4',
+                  }}
+                />
+              );
+            }
+            return null;
+          })()}
 
           {/* Dependency arrows */}
           <GanttDependencyArrows

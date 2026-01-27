@@ -94,7 +94,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 focus:border-cyan-400 focus:outline-none"
                 placeholder="Enter task name"
                 required
                 autoFocus
@@ -111,7 +111,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none"
                   required
                 />
               </div>
@@ -124,7 +124,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   min={startDate}
-                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 focus:border-cyan-400 focus:outline-none"
                   required
                 />
               </div>
