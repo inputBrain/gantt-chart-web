@@ -50,11 +50,19 @@ export function generateBezierPath(from: Point, to: Point): string {
               L ${to.x} ${to.y}`;
     }
 
+    // Route: right → down to midpoint → left past to.x → down to target row → right to to.x
+    const midY = from.y + dy / 2;
+    const approachX = to.x - leftOffset;
+
     return `M ${from.x} ${from.y}
             L ${from.x + rightOffset - radius} ${from.y}
             Q ${from.x + rightOffset} ${from.y}, ${from.x + rightOffset} ${from.y + radius * dirY}
-            L ${from.x + rightOffset} ${to.y - radius * dirY}
-            Q ${from.x + rightOffset} ${to.y}, ${from.x + rightOffset - radius} ${to.y}
+            L ${from.x + rightOffset} ${midY - radius * dirY}
+            Q ${from.x + rightOffset} ${midY}, ${from.x + rightOffset - radius} ${midY}
+            L ${approachX + radius} ${midY}
+            Q ${approachX} ${midY}, ${approachX} ${midY + radius * dirY}
+            L ${approachX} ${to.y - radius * dirY}
+            Q ${approachX} ${to.y}, ${approachX + radius} ${to.y}
             L ${to.x} ${to.y}`;
   }
 }
