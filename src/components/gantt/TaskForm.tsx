@@ -15,12 +15,12 @@ function getDefaultDates() {
 }
 
 const inputStyle: React.CSSProperties = {
-  background: '#181a20',
-  borderColor: '#2b3139',
-  color: '#eaecef',
+  background: 'var(--bg-input)',
+  borderColor: 'var(--border)',
+  color: 'var(--text-primary)',
 };
 
-const inputFocusClass = 'w-full rounded border px-4 py-2.5 text-sm focus:border-[#f0b90b] focus:outline-none';
+const inputFocusClass = 'w-full rounded border px-4 py-2.5 text-sm focus:border-[--accent] focus:outline-none';
 
 function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tasks: Task[] }) {
   const { addTask, updateTask, deleteTask, closeForm } = useGantt();
@@ -72,18 +72,18 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
   const availableDependencies = tasks.filter((t) => !editingTask || t.id !== editingTask.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.6)' }}>
-      <div className="w-full max-w-md overflow-hidden rounded-lg border" style={{ background: '#1e2329', borderColor: '#2b3139' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'var(--overlay)' }}>
+      <div className="w-full max-w-md overflow-hidden rounded-lg border" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
         {/* Header */}
-        <div className="border-b px-6 py-4" style={{ background: '#181a20', borderColor: '#2b3139' }}>
+        <div className="border-b px-6 py-4" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold" style={{ color: '#eaecef' }}>
+            <h2 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
               {editingTask ? 'Edit Task' : 'New Task'}
             </h2>
             <button
               onClick={closeForm}
               className="rounded p-1"
-              style={{ color: '#5e6673' }}
+              style={{ color: 'var(--text-tertiary)' }}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -96,7 +96,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
           <div className="space-y-4">
             {/* Task Name */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#848e9c' }}>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                 Task Name
               </label>
               <input
@@ -114,7 +114,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
             {/* Dates */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#848e9c' }}>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Start Date
                 </label>
                 <input
@@ -127,7 +127,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#848e9c' }}>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   End Date
                 </label>
                 <input
@@ -144,7 +144,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
 
             {/* Color */}
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#848e9c' }}>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                 Color
               </label>
               <div className="flex gap-2">
@@ -155,7 +155,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                     onClick={() => setColor(c)}
                     className={`h-8 w-8 rounded-full ${TASK_COLORS[c].progress}`}
                     style={{
-                      outline: color === c ? '2px solid #f0b90b' : undefined,
+                      outline: color === c ? '2px solid var(--accent)' : undefined,
                       outlineOffset: color === c ? '2px' : undefined,
                       transform: color === c ? 'scale(1.1)' : undefined,
                     }}
@@ -167,22 +167,22 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
             {/* Dependencies */}
             {availableDependencies.length > 0 && (
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#848e9c' }}>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Dependencies
                 </label>
-                <div className="max-h-32 space-y-1 overflow-auto rounded border p-2" style={{ background: '#181a20', borderColor: '#2b3139' }}>
+                <div className="max-h-32 space-y-1 overflow-auto rounded border p-2" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
                   {availableDependencies.map((task) => (
                     <label
                       key={task.id}
                       className="flex cursor-pointer items-center gap-2 rounded px-3 py-2"
-                      style={{ color: '#eaecef' }}
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       <input
                         type="checkbox"
                         checked={dependsOn.includes(task.id)}
                         onChange={() => handleDependencyToggle(task.id)}
                         className="h-4 w-4 rounded"
-                        style={{ accentColor: '#f0b90b' }}
+                        style={{ accentColor: 'var(--accent)' }}
                       />
                       <div className={`h-2.5 w-2.5 rounded-full ${TASK_COLORS[task.color].progress}`} />
                       <span className="text-sm">{task.name}</span>
@@ -201,7 +201,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                   type="button"
                   onClick={handleDelete}
                   className="rounded px-3 py-2 text-xs font-semibold"
-                  style={{ color: '#f6465d' }}
+                  style={{ color: 'var(--red)' }}
                 >
                   Delete Task
                 </button>
@@ -212,14 +212,14 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 type="button"
                 onClick={closeForm}
                 className="rounded border px-5 py-2.5 text-xs font-semibold"
-                style={{ borderColor: '#2b3139', background: '#181a20', color: '#848e9c' }}
+                style={{ borderColor: 'var(--border)', background: 'var(--bg-input)', color: 'var(--text-secondary)' }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="rounded px-5 py-2.5 text-xs font-semibold"
-                style={{ background: '#f0b90b', color: '#0b0e11' }}
+                style={{ background: 'var(--accent)', color: 'var(--bg-primary)' }}
               >
                 {editingTask ? 'Save Changes' : 'Create Task'}
               </button>

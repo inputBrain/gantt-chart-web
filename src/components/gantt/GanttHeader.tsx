@@ -1,50 +1,51 @@
 'use client';
 
 import { useGantt } from '@/context/GanttContext';
+import { useTheme } from '@/context/ThemeContext';
 import { getHeaderLabel } from '@/utils/dateUtils';
 import { ViewMode } from '@/types/gantt';
 
 export function GanttHeader() {
   const { state, setViewMode, navigate, goToToday } = useGantt();
+  const { theme, toggleTheme } = useTheme();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
   };
 
   return (
-    <div className="flex items-center justify-between border-b px-6 py-3" style={{ background: '#1e2329', borderColor: '#2b3139' }}>
+    <div
+      className="flex items-center justify-between border-b px-6 py-3"
+      style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+    >
       {/* Left: Logo & View Mode */}
       <div className="flex items-center gap-5">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: '#f0b90b' }}>
-            <svg className="h-4 w-4" style={{ color: '#0b0e11' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: 'var(--accent)' }}>
+            <svg className="h-4 w-4" style={{ color: 'var(--bg-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <h1 className="text-base font-bold" style={{ color: '#eaecef' }}>Gantt</h1>
+          <h1 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>Gantt</h1>
         </div>
 
-        <div className="flex items-center rounded-md p-0.5" style={{ background: '#2b3139' }}>
+        <div className="flex items-center rounded-md p-0.5" style={{ background: 'var(--bg-surface-hover)' }}>
           <button
             onClick={() => handleViewModeChange('month')}
-            className={`rounded px-3 py-1.5 text-xs font-semibold ${
-              state.viewMode === 'month'
-                ? ''
-                : ''
-            }`}
+            className="rounded px-3 py-1.5 text-xs font-semibold"
             style={state.viewMode === 'month'
-              ? { background: '#363c45', color: '#eaecef' }
-              : { color: '#848e9c' }
+              ? { background: 'var(--tab-active-bg)', color: 'var(--text-primary)' }
+              : { color: 'var(--text-secondary)' }
             }
           >
             Month
           </button>
           <button
             onClick={() => handleViewModeChange('year')}
-            className={`rounded px-3 py-1.5 text-xs font-semibold`}
+            className="rounded px-3 py-1.5 text-xs font-semibold"
             style={state.viewMode === 'year'
-              ? { background: '#363c45', color: '#eaecef' }
-              : { color: '#848e9c' }
+              ? { background: 'var(--tab-active-bg)', color: 'var(--text-primary)' }
+              : { color: 'var(--text-secondary)' }
             }
           >
             Year
@@ -57,7 +58,7 @@ export function GanttHeader() {
         <button
           onClick={goToToday}
           className="rounded px-3 py-1.5 text-xs font-semibold"
-          style={{ background: '#f0b90b', color: '#0b0e11' }}
+          style={{ background: 'var(--accent)', color: 'var(--bg-primary)' }}
         >
           Today
         </button>
@@ -66,15 +67,15 @@ export function GanttHeader() {
           <button
             onClick={() => navigate('prev')}
             className="flex h-8 w-8 items-center justify-center rounded border"
-            style={{ borderColor: '#2b3139', background: '#1e2329', color: '#848e9c' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
-          <div className="flex min-w-[150px] items-center justify-center rounded border px-4 py-1.5" style={{ borderColor: '#2b3139', background: '#181a20' }}>
-            <span className="text-sm font-semibold tabular-nums" style={{ color: '#eaecef' }}>
+          <div className="flex min-w-[150px] items-center justify-center rounded border px-4 py-1.5" style={{ borderColor: 'var(--border)', background: 'var(--bg-input)' }}>
+            <span className="text-sm font-semibold tabular-nums" style={{ color: 'var(--text-primary)' }}>
               {getHeaderLabel(state.currentDate, state.viewMode)}
             </span>
           </div>
@@ -82,7 +83,7 @@ export function GanttHeader() {
           <button
             onClick={() => navigate('next')}
             className="flex h-8 w-8 items-center justify-center rounded border"
-            style={{ borderColor: '#2b3139', background: '#1e2329', color: '#848e9c' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -91,8 +92,25 @@ export function GanttHeader() {
         </div>
       </div>
 
-      {/* Right: empty for balance */}
-      <div className="w-[180px]" />
+      {/* Right: Theme toggle */}
+      <div className="flex w-[180px] justify-end">
+        <button
+          onClick={toggleTheme}
+          className="flex h-8 w-8 items-center justify-center rounded border"
+          style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        >
+          {theme === 'dark' ? (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

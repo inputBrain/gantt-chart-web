@@ -44,7 +44,7 @@ export function GanttDependencyArrows({ tasks, config, rowHeight, timelineHeight
   return (
     <svg
       className="pointer-events-none absolute left-0 top-0"
-      style={{ color: '#f0b90b', width: config.totalWidth, height: timelineHeight }}
+      style={{ color: 'var(--accent)', width: config.totalWidth, height: timelineHeight }}
     >
       <defs>
         <marker

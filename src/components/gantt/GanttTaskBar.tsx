@@ -36,16 +36,14 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
   return (
     <div
-      className={`group absolute flex cursor-pointer items-center rounded ${colors.bg} ${
-        isDragging ? '' : ''
-      }`}
+      className={`group absolute flex cursor-pointer items-center rounded ${colors.bg}`}
       style={{
         left: Math.max(0, position.left),
         width: Math.min(position.width, config.totalWidth - position.left),
         top: position.top + 10,
         height: 30,
-        border: isSelected ? '1px solid #f0b90b' : '1px solid transparent',
-        boxShadow: isSelected ? '0 0 8px rgba(240, 185, 11, 0.2)' : isDragging ? '0 2px 8px rgba(0,0,0,0.4)' : undefined,
+        border: isSelected ? '1px solid var(--selected-border)' : '1px solid transparent',
+        boxShadow: isSelected ? '0 0 8px var(--selected-glow)' : isDragging ? '0 2px 8px rgba(0,0,0,0.4)' : undefined,
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
@@ -57,7 +55,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
         }`}
         onMouseDown={handleLeftHandleMouseDown}
       >
-        <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }} />
+        <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ background: 'var(--handle-color)' }} />
       </div>
 
       {/* Progress bar */}
@@ -69,7 +67,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
       {/* Task name */}
       <div
         className="relative z-10 flex-1 truncate px-2.5 text-xs font-semibold"
-        style={{ color: '#eaecef' }}
+        style={{ color: 'var(--task-text)' }}
         onMouseDown={handleBarMouseDown}
       >
         {task.name}
@@ -82,7 +80,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
         }`}
         onMouseDown={handleRightHandleMouseDown}
       >
-        <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }} />
+        <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ background: 'var(--handle-color)' }} />
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export function GanttTimeline() {
   const timelineHeight = Math.max(state.tasks.length * ROW_HEIGHT, 400);
 
   return (
-    <div className="relative flex-1 overflow-auto rounded-lg border" style={{ background: '#0b0e11', borderColor: '#2b3139' }}>
+    <div className="relative flex-1 overflow-auto rounded-lg border" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
       <div
         className="relative"
         style={{ width: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
@@ -34,7 +34,7 @@ export function GanttTimeline() {
         {/* Header */}
         <div
           className="sticky top-0 z-20 border-b"
-          style={{ height: HEADER_HEIGHT, background: '#1e2329', borderColor: '#2b3139' }}
+          style={{ height: HEADER_HEIGHT, background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
         >
           <div className="flex h-full">
             {state.viewMode === 'month' ? (
@@ -48,12 +48,12 @@ export function GanttTimeline() {
                     style={{
                       width: config.pixelsPerDay,
                       minWidth: config.pixelsPerDay,
-                      borderColor: '#2b3139',
-                      background: today ? 'rgba(240, 185, 11, 0.08)' : weekend ? '#181a20' : undefined,
+                      borderColor: 'var(--border)',
+                      background: today ? 'var(--today-bg)' : weekend ? 'var(--weekend-header)' : undefined,
                     }}
                   >
                     <span className="text-[10px] font-semibold uppercase tracking-wider" style={{
-                      color: today ? '#f0b90b' : '#5e6673'
+                      color: today ? 'var(--accent)' : 'var(--text-tertiary)'
                     }}>
                       {['S', 'M', 'T', 'W', 'T', 'F', 'S'][col.date.getDay()]}
                     </span>
@@ -64,8 +64,8 @@ export function GanttTimeline() {
                           : ''
                       }`}
                       style={today
-                        ? { background: '#f0b90b', color: '#0b0e11' }
-                        : { color: '#eaecef' }
+                        ? { background: 'var(--accent)', color: 'var(--bg-primary)' }
+                        : { color: 'var(--text-primary)' }
                       }
                     >
                       {col.label}
@@ -85,11 +85,11 @@ export function GanttTimeline() {
                     style={{
                       width: monthWidth,
                       minWidth: monthWidth,
-                      borderColor: '#2b3139',
-                      background: isCurrentMonth ? 'rgba(240, 185, 11, 0.06)' : undefined,
+                      borderColor: 'var(--border)',
+                      background: isCurrentMonth ? 'var(--today-bg)' : undefined,
                     }}
                   >
-                    <span className="text-xs font-bold" style={{ color: isCurrentMonth ? '#f0b90b' : '#eaecef' }}>
+                    <span className="text-xs font-bold" style={{ color: isCurrentMonth ? 'var(--accent)' : 'var(--text-primary)' }}>
                       {col.label}
                     </span>
                   </div>
@@ -115,8 +115,8 @@ export function GanttTimeline() {
                         left: idx * config.pixelsPerDay,
                         width: config.pixelsPerDay,
                         height: timelineHeight,
-                        borderColor: '#181a20',
-                        background: today ? 'rgba(240, 185, 11, 0.04)' : weekend ? 'rgba(24, 26, 32, 0.5)' : undefined,
+                        borderColor: 'var(--grid-line)',
+                        background: today ? 'var(--today-grid)' : weekend ? 'var(--weekend-bg)' : undefined,
                       }}
                     />
                   );
@@ -135,7 +135,7 @@ export function GanttTimeline() {
                         left: offset,
                         width: daysInMonth * config.pixelsPerDay,
                         height: timelineHeight,
-                        borderColor: '#2b3139',
+                        borderColor: 'var(--border)',
                       }}
                     />
                   );
@@ -148,7 +148,7 @@ export function GanttTimeline() {
               <div
                 key={idx}
                 className="absolute left-0 right-0 border-b"
-                style={{ top: (idx + 1) * ROW_HEIGHT, borderColor: '#181a20' }}
+                style={{ top: (idx + 1) * ROW_HEIGHT, borderColor: 'var(--row-line)' }}
               />
             ))}
           </div>
