@@ -1,36 +1,33 @@
 @import "tailwindcss";
 
 /*
- * Theme: Crypto Exchange Light
- * Inspired by Binance, Bybit, OKX
- * To switch themes, replace the :root variables below
+ * Theme System
+ * Switch themes by changing data-theme attribute on <html>
+ * Default: crypto-yellow (Binance style)
  */
+
+/* ===== Default Theme: Crypto Yellow (Binance) ===== */
 :root {
-  /* Backgrounds */
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-tertiary: #f5f5f5;
   --bg-hover: #f0f0f0;
   --bg-active: #e8e8e8;
 
-  /* Borders */
   --border-primary: #eaecef;
   --border-secondary: #e0e3e7;
   --border-focus: #b7bdc6;
 
-  /* Text */
   --text-primary: #1e2329;
   --text-secondary: #474d57;
   --text-tertiary: #848e9c;
   --text-quaternary: #b7bdc6;
 
-  /* Accent (main brand color - Binance yellow) */
   --accent: #f0b90b;
   --accent-hover: #d9a60a;
   --accent-light: #fef6d8;
   --accent-text: #1e2329;
 
-  /* Semantic colors */
   --success: #0ecb81;
   --success-light: #e6f9f1;
   --danger: #f6465d;
@@ -40,11 +37,9 @@
   --info: #1e88e5;
   --info-light: #e3f2fd;
 
-  /* Today indicator */
   --today: #f0b90b;
   --today-bg: #fef6d8;
 
-  /* Task colors */
   --task-blue: #1e88e5;
   --task-blue-bg: #e3f2fd;
   --task-green: #0ecb81;
@@ -63,8 +58,112 @@
   --task-yellow-bg: #fef9c3;
 }
 
+/* ===== Theme: Crypto Blue (Coinbase/Kraken) ===== */
+[data-theme="blue"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-active: #cbd5e1;
+
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-focus: #94a3b8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --text-quaternary: #cbd5e1;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #eff6ff;
+  --accent-text: #ffffff;
+
+  --success: #16a34a;
+  --success-light: #f0fdf4;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --info: #2563eb;
+  --info-light: #eff6ff;
+
+  --today: #2563eb;
+  --today-bg: #eff6ff;
+}
+
+/* ===== Theme: Crypto Green (Robinhood) ===== */
+[data-theme="green"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-hover: #e5e7eb;
+  --bg-active: #d1d5db;
+
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+  --border-focus: #9ca3af;
+
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #9ca3af;
+  --text-quaternary: #d1d5db;
+
+  --accent: #00c805;
+  --accent-hover: #00a804;
+  --accent-light: #ecfdf5;
+  --accent-text: #ffffff;
+
+  --success: #00c805;
+  --success-light: #ecfdf5;
+  --danger: #ff5000;
+  --danger-light: #fff7ed;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --info: #3b82f6;
+  --info-light: #eff6ff;
+
+  --today: #00c805;
+  --today-bg: #ecfdf5;
+}
+
+/* ===== Theme: Neutral (Minimal) ===== */
+[data-theme="neutral"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f5f5f5;
+  --bg-hover: #e5e5e5;
+  --bg-active: #d4d4d4;
+
+  --border-primary: #e5e5e5;
+  --border-secondary: #d4d4d4;
+  --border-focus: #a3a3a3;
+
+  --text-primary: #171717;
+  --text-secondary: #404040;
+  --text-tertiary: #737373;
+  --text-quaternary: #a3a3a3;
+
+  --accent: #171717;
+  --accent-hover: #262626;
+  --accent-light: #f5f5f5;
+  --accent-text: #ffffff;
+
+  --success: #22c55e;
+  --success-light: #f0fdf4;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --info: #3b82f6;
+  --info-light: #eff6ff;
+
+  --today: #171717;
+  --today-bg: #f5f5f5;
+}
+
 @theme inline {
-  /* Map CSS variables to Tailwind */
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-bg-tertiary: var(--bg-tertiary);
@@ -93,7 +192,6 @@
   --color-today: var(--today);
   --color-today-bg: var(--today-bg);
 
-  /* Task colors */
   --color-task-blue: var(--task-blue);
   --color-task-blue-bg: var(--task-blue-bg);
   --color-task-green: var(--task-green);
@@ -122,7 +220,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Clean scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -141,7 +238,6 @@ body {
   background: var(--text-quaternary);
 }
 
-/* Smooth transitions */
 button, a {
   transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }

@@ -1,11 +1,13 @@
 'use client';
 
 import { useGantt } from '@/context/GanttContext';
+import { useTheme, THEMES } from '@/context/ThemeContext';
 import { getHeaderLabel } from '@/utils/dateUtils';
 import { ViewMode } from '@/types/gantt';
 
 export function GanttHeader() {
   const { state, setViewMode, navigate, goToToday } = useGantt();
+  const { theme, setTheme } = useTheme();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -84,8 +86,23 @@ export function GanttHeader() {
         </div>
       </div>
 
-      {/* Right: empty for balance */}
-      <div className="w-[180px]" />
+      {/* Right: Theme Selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-text-tertiary">Theme</span>
+        <div className="flex items-center gap-1 rounded-lg bg-bg-tertiary p-1">
+          {THEMES.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              className={`h-6 w-6 rounded-md ${
+                theme === t.id ? 'ring-2 ring-text-tertiary ring-offset-1' : ''
+              }`}
+              style={{ backgroundColor: t.color }}
+              title={t.name}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
