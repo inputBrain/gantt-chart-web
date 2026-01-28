@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useGantt } from '@/context/GanttContext';
-import { TASK_COLORS } from '@/types/gantt';
+import { TASK_COLORS, Task } from '@/types/gantt';
 import { formatDate, calculateProgress } from '@/utils/dateUtils';
 
 export function GanttTaskList() {
   const { state, selectTask, openForm, deleteTask } = useGantt();
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   return (
     <div className="w-80 flex-shrink-0 border-r border-neutral-200 bg-neutral-50/50">
@@ -82,9 +84,7 @@ export function GanttTaskList() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm('Delete this task?')) {
-                            deleteTask(task.id);
-                          }
+                          setTaskToDelete(task);
                         }}
                         className="rounded-lg p-1.5 text-neutral-400 hover:bg-red-50 hover:text-red-500"
                       >
@@ -136,6 +136,44 @@ export function GanttTaskList() {
           </div>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {taskToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl">
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h3 className="mb-1 text-base font-bold text-neutral-800">Delete Task</h3>
+              <p className="mb-6 text-sm text-neutral-500">
+                Are you sure you want to delete <span className="font-semibold text-neutral-700">{taskToDelete.name}</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTaskToDelete(null)}
+                  className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteTask(taskToDelete.id);
+                    setTaskToDelete(null);
+                  }}
+                  className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
