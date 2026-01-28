@@ -52,14 +52,14 @@ export function GanttTimeline() {
   const timelineHeight = Math.max(state.tasks.length * ROW_HEIGHT, 400);
 
   return (
-    <div ref={containerRef} className="relative flex-1 overflow-auto bg-white">
+    <div ref={containerRef} className="relative flex-1 overflow-auto bg-bg-primary">
       <div
         className="relative"
         style={{ minWidth: config.totalWidth, minHeight: timelineHeight + HEADER_HEIGHT }}
       >
         {/* Header */}
         <div
-          className="sticky top-0 z-20 border-b border-neutral-200 bg-neutral-50"
+          className="sticky top-0 z-20 border-b border-border-primary bg-bg-secondary"
           style={{ height: HEADER_HEIGHT }}
         >
           <div className="flex h-full">
@@ -70,21 +70,21 @@ export function GanttTimeline() {
                 return (
                   <div
                     key={idx}
-                    className={`flex flex-col items-center justify-center border-r border-neutral-200 ${
-                      weekend ? 'bg-neutral-100/70' : ''
-                    } ${today ? 'bg-cyan-50' : ''}`}
+                    className={`flex flex-col items-center justify-center border-r border-border-primary ${
+                      weekend ? 'bg-bg-tertiary' : ''
+                    } ${today ? 'bg-today-bg' : ''}`}
                     style={{ flex: `0 0 ${config.pixelsPerDay}px`, minWidth: config.pixelsPerDay }}
                   >
                     <span className={`text-[10px] font-semibold uppercase tracking-wider ${
-                      today ? 'text-cyan-600' : 'text-neutral-400'
+                      today ? 'text-today' : 'text-text-quaternary'
                     }`}>
                       {['S', 'M', 'T', 'W', 'T', 'F', 'S'][col.date.getDay()]}
                     </span>
                     <span
                       className={`text-xs font-bold tabular-nums ${
                         today
-                          ? 'flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500 text-white'
-                          : 'text-neutral-700'
+                          ? 'flex h-6 w-6 items-center justify-center rounded-full bg-today text-accent-text'
+                          : 'text-text-secondary'
                       }`}
                     >
                       {col.label}
@@ -100,12 +100,12 @@ export function GanttTimeline() {
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center justify-center border-r border-neutral-200 ${
-                      isCurrentMonth ? 'bg-cyan-50/50' : ''
+                    className={`flex items-center justify-center border-r border-border-primary ${
+                      isCurrentMonth ? 'bg-today-bg' : ''
                     }`}
                     style={{ flex: `0 0 ${monthWidth}px`, minWidth: monthWidth }}
                   >
-                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-cyan-700' : 'text-neutral-700'}`}>
+                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-today' : 'text-text-secondary'}`}>
                       {col.label}
                     </span>
                   </div>
@@ -126,9 +126,9 @@ export function GanttTimeline() {
                   return (
                     <div
                       key={idx}
-                      className={`absolute top-0 border-r border-neutral-100 ${
-                        weekend ? 'bg-neutral-50/70' : ''
-                      } ${today ? 'bg-cyan-50/30' : ''}`}
+                      className={`absolute top-0 border-r border-border-primary/50 ${
+                        weekend ? 'bg-bg-tertiary/50' : ''
+                      } ${today ? 'bg-today-bg/30' : ''}`}
                       style={{
                         left: idx * config.pixelsPerDay,
                         width: config.pixelsPerDay,
@@ -146,7 +146,7 @@ export function GanttTimeline() {
                   return (
                     <div
                       key={idx}
-                      className="absolute top-0 border-r border-neutral-200"
+                      className="absolute top-0 border-r border-border-primary"
                       style={{
                         left: offset,
                         width: daysInMonth * config.pixelsPerDay,
@@ -162,7 +162,7 @@ export function GanttTimeline() {
             {state.tasks.map((_, idx) => (
               <div
                 key={idx}
-                className="absolute left-0 right-0 border-b border-neutral-100"
+                className="absolute left-0 right-0 border-b border-border-primary/50"
                 style={{ top: (idx + 1) * ROW_HEIGHT }}
               />
             ))}
@@ -178,13 +178,12 @@ export function GanttTimeline() {
             if (todayX >= 0 && todayX <= config.totalWidth) {
               return (
                 <div
-                  className="pointer-events-none absolute z-10"
+                  className="pointer-events-none absolute z-10 bg-today"
                   style={{
                     left: todayX,
                     top: 0,
                     width: 2,
                     height: timelineHeight,
-                    backgroundColor: '#06b6d4',
                   }}
                 />
               );

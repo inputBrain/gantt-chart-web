@@ -36,8 +36,8 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
   return (
     <div
-      className={`group absolute flex cursor-pointer items-center rounded-lg ${colors.bg} shadow-sm ${
-        isSelected ? 'ring-2 ring-cyan-400 ring-offset-1 shadow-md' : ''
+      className={`group absolute flex cursor-pointer items-center rounded-md ${colors.bg} border ${colors.border} ${
+        isSelected ? 'ring-2 ring-accent ring-offset-1 shadow-md' : ''
       } ${isDragging ? 'shadow-lg' : 'hover:shadow-md'}`}
       style={{
         left: Math.max(0, position.left),
@@ -60,13 +60,13 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
       {/* Progress bar */}
       <div
-        className={`absolute left-0 top-0 h-full rounded-l-lg ${colors.progress}`}
+        className={`absolute left-0 top-0 h-full rounded-l-md ${colors.progress}`}
         style={{ width: `${progress}%`, opacity: 0.35 }}
       />
 
       {/* Task name */}
       <div
-        className="relative z-10 flex-1 truncate px-2.5 text-xs font-semibold text-neutral-800"
+        className="relative z-10 flex-1 truncate px-2.5 text-xs font-semibold text-text-primary"
         onMouseDown={handleBarMouseDown}
       >
         {task.name}

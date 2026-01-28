@@ -1,20 +1,123 @@
 @import "tailwindcss";
 
+/*
+ * Theme: Crypto Exchange Light
+ * Inspired by Binance, Bybit, OKX
+ * To switch themes, replace the :root variables below
+ */
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f5f5f5;
+  --bg-hover: #f0f0f0;
+  --bg-active: #e8e8e8;
+
+  /* Borders */
+  --border-primary: #eaecef;
+  --border-secondary: #e0e3e7;
+  --border-focus: #b7bdc6;
+
+  /* Text */
+  --text-primary: #1e2329;
+  --text-secondary: #474d57;
+  --text-tertiary: #848e9c;
+  --text-quaternary: #b7bdc6;
+
+  /* Accent (main brand color - Binance yellow) */
+  --accent: #f0b90b;
+  --accent-hover: #d9a60a;
+  --accent-light: #fef6d8;
+  --accent-text: #1e2329;
+
+  /* Semantic colors */
+  --success: #0ecb81;
+  --success-light: #e6f9f1;
+  --danger: #f6465d;
+  --danger-light: #fef0f2;
+  --warning: #f0b90b;
+  --warning-light: #fef6d8;
+  --info: #1e88e5;
+  --info-light: #e3f2fd;
+
+  /* Today indicator */
+  --today: #f0b90b;
+  --today-bg: #fef6d8;
+
+  /* Task colors */
+  --task-blue: #1e88e5;
+  --task-blue-bg: #e3f2fd;
+  --task-green: #0ecb81;
+  --task-green-bg: #e6f9f1;
+  --task-purple: #7c3aed;
+  --task-purple-bg: #ede9fe;
+  --task-orange: #f59e0b;
+  --task-orange-bg: #fef3c7;
+  --task-red: #f6465d;
+  --task-red-bg: #fef0f2;
+  --task-teal: #14b8a6;
+  --task-teal-bg: #ccfbf1;
+  --task-pink: #ec4899;
+  --task-pink-bg: #fce7f3;
+  --task-yellow: #eab308;
+  --task-yellow-bg: #fef9c3;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Map CSS variables to Tailwind */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-active: var(--bg-active);
+
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+  --color-border-focus: var(--border-focus);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-quaternary);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-text: var(--accent-text);
+
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
+
+  --color-today: var(--today);
+  --color-today-bg: var(--today-bg);
+
+  /* Task colors */
+  --color-task-blue: var(--task-blue);
+  --color-task-blue-bg: var(--task-blue-bg);
+  --color-task-green: var(--task-green);
+  --color-task-green-bg: var(--task-green-bg);
+  --color-task-purple: var(--task-purple);
+  --color-task-purple-bg: var(--task-purple-bg);
+  --color-task-orange: var(--task-orange);
+  --color-task-orange-bg: var(--task-orange-bg);
+  --color-task-red: var(--task-red);
+  --color-task-red-bg: var(--task-red-bg);
+  --color-task-teal: var(--task-teal);
+  --color-task-teal-bg: var(--task-teal-bg);
+  --color-task-pink: var(--task-pink);
+  --color-task-pink-bg: var(--task-pink-bg);
+  --color-task-yellow: var(--task-yellow);
+  --color-task-yellow-bg: var(--task-yellow-bg);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -26,27 +129,25 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: var(--bg-tertiary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: var(--border-secondary);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
-}
-
-/* Subtle neon focus */
-*:focus-visible {
-  outline: 2px solid #06b6d4;
-  outline-offset: 2px;
+  background: var(--text-quaternary);
 }
 
 /* Smooth transitions */
-button, a, input, select {
-  transition: all 0.15s ease;
+button, a {
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+input, select {
+  transition: border-color 0.12s ease;
 }
 
 .tabular-nums {

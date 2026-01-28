@@ -47,12 +47,12 @@ export interface TaskPosition {
 }
 
 export const TASK_COLORS: Record<TaskColor, { bg: string; progress: string; border: string }> = {
-  blue: { bg: 'bg-blue-500/30', progress: 'bg-blue-500', border: 'border-blue-500' },
-  green: { bg: 'bg-green-500/30', progress: 'bg-green-500', border: 'border-green-500' },
-  purple: { bg: 'bg-purple-500/30', progress: 'bg-purple-500', border: 'border-purple-500' },
-  orange: { bg: 'bg-orange-500/30', progress: 'bg-orange-500', border: 'border-orange-500' },
-  red: { bg: 'bg-red-500/30', progress: 'bg-red-500', border: 'border-red-500' },
-  teal: { bg: 'bg-teal-500/30', progress: 'bg-teal-500', border: 'border-teal-500' },
-  pink: { bg: 'bg-pink-500/30', progress: 'bg-pink-500', border: 'border-pink-500' },
-  yellow: { bg: 'bg-yellow-500/30', progress: 'bg-yellow-500', border: 'border-yellow-500' },
+  blue: { bg: 'bg-task-blue-bg', progress: 'bg-task-blue', border: 'border-task-blue' },
+  green: { bg: 'bg-task-green-bg', progress: 'bg-task-green', border: 'border-task-green' },
+  purple: { bg: 'bg-task-purple-bg', progress: 'bg-task-purple', border: 'border-task-purple' },
+  orange: { bg: 'bg-task-orange-bg', progress: 'bg-task-orange', border: 'border-task-orange' },
+  red: { bg: 'bg-task-red-bg', progress: 'bg-task-red', border: 'border-task-red' },
+  teal: { bg: 'bg-task-teal-bg', progress: 'bg-task-teal', border: 'border-task-teal' },
+  pink: { bg: 'bg-task-pink-bg', progress: 'bg-task-pink', border: 'border-task-pink' },
+  yellow: { bg: 'bg-task-yellow-bg', progress: 'bg-task-yellow', border: 'border-task-yellow' },
 };
