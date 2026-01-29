@@ -42,6 +42,13 @@ export function formatDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
+export function formatDateShort(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = MONTH_NAMES_SHORT[date.getMonth()];
+  const year = String(date.getFullYear()).slice(-2);
+  return `${day}-${month}-${year}`;
+}
+
 export function parseDate(dateString: string): Date {
   const [year, month, day] = dateString.split('-').map(Number);
   return new Date(year, month - 1, day);
