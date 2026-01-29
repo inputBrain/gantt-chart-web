@@ -30,39 +30,64 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
     openForm(task);
   };
 
-  if (position.width <= 0 || position.left + position.width < 0 || position.left > config.totalWidth) {
+  // Calculate visible portion of the task bar
+  const visibleLeft = Math.max(0, position.left);
+  const visibleRight = Math.min(position.left + position.width, config.totalWidth);
+  const visibleWidth = visibleRight - visibleLeft;
+
+  // Hide if task is completely outside the visible area
+  if (visibleWidth <= 0) {
     return null;
   }
 
+  // Check if task is clipped on left or right side
+  const isClippedLeft = position.left < 0;
+  const isClippedRight = position.left + position.width > config.totalWidth;
+
   return (
     <div
-      className={`group absolute flex cursor-pointer items-center rounded-md ${colors.bg} border ${colors.border} ${
+      className={`group absolute flex cursor-pointer items-center ${colors.bg} border ${colors.border} ${
         isSelected ? 'ring-2 ring-accent ring-offset-1 shadow-md' : ''
-      } ${isDragging ? 'shadow-lg' : 'hover:shadow-md'}`}
+      } ${isDragging ? 'shadow-lg' : 'hover:shadow-md'} ${
+        isClippedLeft ? 'rounded-l-none' : 'rounded-l-md'
+      } ${isClippedRight ? 'rounded-r-none' : 'rounded-r-md'}`}
       style={{
-        left: Math.max(0, position.left),
-        width: Math.min(position.width, config.totalWidth - position.left),
+        left: visibleLeft,
+        width: visibleWidth,
         top: position.top + 10,
         height: 30,
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      {/* Left resize handle */}
-      <div
-        className={`absolute -left-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
-          isDragging && dragType === 'left' ? 'opacity-100' : ''
-        }`}
-        onMouseDown={handleLeftHandleMouseDown}
-      >
-        <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
-      </div>
+      {/* Left resize handle - only show if not clipped on left */}
+      {!isClippedLeft && (
+        <div
+          className={`absolute -left-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
+            isDragging && dragType === 'left' ? 'opacity-100' : ''
+          }`}
+          onMouseDown={handleLeftHandleMouseDown}
+        >
+          <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
+        </div>
+      )}
 
-      {/* Progress bar */}
-      <div
-        className={`absolute left-0 top-0 h-full rounded-l-md ${colors.progress}`}
-        style={{ width: `${progress}%`, opacity: 0.35 }}
-      />
+      {/* Progress bar - adjusted for visible portion */}
+      {(() => {
+        // Calculate progress bar width relative to visible area
+        const totalWidth = position.width;
+        const progressWidth = (progress / 100) * totalWidth;
+        const clippedLeft = Math.max(0, -position.left);
+        const visibleProgressWidth = Math.max(0, Math.min(progressWidth - clippedLeft, visibleWidth));
+        const progressPercent = (visibleProgressWidth / visibleWidth) * 100;
+
+        return progressPercent > 0 ? (
+          <div
+            className={`absolute left-0 top-0 h-full ${colors.progress} ${!isClippedLeft ? 'rounded-l-md' : ''}`}
+            style={{ width: `${progressPercent}%`, opacity: 0.35 }}
+          />
+        ) : null;
+      })()}
 
       {/* Task name */}
       <div
@@ -72,15 +97,17 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
         {task.name}
       </div>
 
-      {/* Right resize handle */}
-      <div
-        className={`absolute -right-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
-          isDragging && dragType === 'right' ? 'opacity-100' : ''
-        }`}
-        onMouseDown={handleRightHandleMouseDown}
-      >
-        <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
-      </div>
+      {/* Right resize handle - only show if not clipped on right */}
+      {!isClippedRight && (
+        <div
+          className={`absolute -right-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
+            isDragging && dragType === 'right' ? 'opacity-100' : ''
+          }`}
+          onMouseDown={handleRightHandleMouseDown}
+        >
+          <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
+        </div>
+      )}
     </div>
   );
 }
