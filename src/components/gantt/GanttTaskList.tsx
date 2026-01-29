@@ -77,11 +77,11 @@ export function GanttTaskList() {
               return (
                 <div
                   key={task.id}
-                  className="border-b border-border-primary/50"
-                  style={{ minHeight: ROW_HEIGHT }}
+                  className="relative"
+                  style={{ height: isExpanded ? 'auto' : ROW_HEIGHT }}
                 >
                   {/* Row container with padding to align card */}
-                  <div className="px-3" style={{ paddingTop: CARD_TOP_OFFSET, paddingBottom: CARD_TOP_OFFSET }}>
+                  <div className="px-3" style={{ paddingTop: CARD_TOP_OFFSET }}>
                     {/* Card */}
                     <div
                       className={`cursor-pointer rounded-md border overflow-hidden transition-all ${colors.bg} ${colors.border} ${
