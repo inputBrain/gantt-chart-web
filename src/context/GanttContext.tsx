@@ -43,7 +43,7 @@ function saveTasksToStorage(tasks: Task[]): void {
 
 const initialState: GanttState = {
   tasks: [],
-  viewMode: 'month',
+  viewMode: 'year',
   currentDate: new Date(),
   selectedTaskId: null,
   isFormOpen: false,
