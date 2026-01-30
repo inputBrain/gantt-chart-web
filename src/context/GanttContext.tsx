@@ -6,6 +6,18 @@ import { addMonths } from '@/utils/dateUtils';
 
 const STORAGE_KEY = 'gantt-tasks';
 
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for non-secure contexts (HTTP)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 function serializeTasks(tasks: Task[]): string {
   return JSON.stringify(
     tasks.map((task) => ({
@@ -167,7 +179,7 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
   const addTask = useCallback((task: Omit<Task, 'id'>) => {
     const newTask: Task = {
       ...task,
-      id: crypto.randomUUID(),
+      id: generateUUID(),
     };
     dispatch({ type: 'ADD_TASK', payload: newTask });
   }, []);
