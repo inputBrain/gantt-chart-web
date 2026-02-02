@@ -29,6 +29,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
   );
   const [color, setColor] = useState<TaskColor>(editingTask?.color ?? 'blue');
   const [dependsOn, setDependsOn] = useState<string[]>(editingTask?.dependsOn ?? []);
+  const [blocked, setBlocked] = useState(editingTask?.blocked ?? false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -42,6 +43,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
       endDate: parseDate(endDate),
       color,
       dependsOn,
+      blocked,
     };
 
     if (editingTask) {
@@ -213,6 +215,39 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 </div>
               </div>
             )}
+
+            {/* Lock Task */}
+            <div className="flex items-center justify-between rounded-xl border border-border-primary bg-bg-secondary px-4 py-3">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${blocked ? 'bg-warning-light' : 'bg-bg-tertiary'}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className={`h-4 w-4 ${blocked ? 'text-warning' : 'text-text-tertiary'}`}
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-text-primary">Lock Task</div>
+                  <div className="text-xs text-text-tertiary">Prevent dragging and resizing</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBlocked(!blocked)}
+                className={`relative h-6 w-11 rounded-full transition-colors ${blocked ? 'bg-warning' : 'bg-border-secondary'}`}
+              >
+                <span
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${blocked ? 'left-[22px]' : 'left-0.5'}`}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Actions */}
