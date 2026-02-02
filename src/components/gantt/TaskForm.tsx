@@ -137,7 +137,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-primary placeholder-text-quaternary hover:border-border-secondary focus:border-border-focus focus:outline-none"
+                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-primary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none"
                 placeholder="Enter task name"
                 required
                 autoFocus
@@ -219,12 +219,12 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
             {/* Lock Task */}
             <div className="flex items-center justify-between rounded-xl border border-border-primary bg-bg-secondary px-4 py-3">
               <div className="flex items-center gap-3">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${blocked ? 'bg-warning-light' : 'bg-bg-tertiary'}`}>
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${blocked ? 'bg-accent-light' : 'bg-bg-tertiary'}`}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    className={`h-4 w-4 ${blocked ? 'text-warning' : 'text-text-tertiary'}`}
+                    className={`h-4 w-4 ${blocked ? 'text-accent' : 'text-text-tertiary'}`}
                   >
                     <path
                       fillRule="evenodd"
@@ -241,7 +241,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
               <button
                 type="button"
                 onClick={() => setBlocked(!blocked)}
-                className={`relative h-6 w-11 rounded-full transition-colors ${blocked ? 'bg-warning' : 'bg-border-secondary'}`}
+                className={`relative h-6 w-11 rounded-full transition-colors ${blocked ? 'bg-accent' : 'bg-border-secondary'}`}
               >
                 <span
                   className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${blocked ? 'left-[22px]' : 'left-0.5'}`}

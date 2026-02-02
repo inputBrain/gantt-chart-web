@@ -179,7 +179,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
                   >
                     <path d="M14.5 1A4.5 4.5 0 0010 5.5V9H3a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V5.5a3 3 0 116 0v4.25a.75.75 0 101.5 0V5.5A4.5 4.5 0 0014.5 1z" />
                   </svg>
-                  Unblock
+                  Unlock
                 </>
               ) : (
                 <>
@@ -195,7 +195,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
                       clipRule="evenodd"
                     />
                   </svg>
-                  Block
+                  Lock
                 </>
               )}
             </button>
