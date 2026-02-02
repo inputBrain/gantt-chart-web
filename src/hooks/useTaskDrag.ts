@@ -36,6 +36,7 @@ export function useTaskDrag({ task, config, onUpdate }: UseTaskDragProps): UseTa
   });
 
   const startDrag = useCallback((e: React.MouseEvent, type: DragType) => {
+    if (task.blocked) return;
     e.preventDefault();
     e.stopPropagation();
     setDragState({

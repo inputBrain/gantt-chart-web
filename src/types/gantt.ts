@@ -9,6 +9,7 @@ export interface Task {
   endDate: Date;
   color: TaskColor;
   dependsOn: string[];
+  blocked?: boolean;
 }
 
 export interface GanttState {
