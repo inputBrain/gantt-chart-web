@@ -28,6 +28,11 @@ export function Header() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // Hide on preview pages
+  if (pathname?.startsWith('/preview-')) {
+    return null;
+  }
+
   return (
     <>
       <header className="flex h-14 items-center justify-between border-b border-border-primary bg-bg-primary px-6">
