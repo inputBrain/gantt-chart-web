@@ -1,52 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useGantt } from '@/context/GanttContext';
-import { useTheme, THEMES } from '@/context/ThemeContext';
 import { getHeaderLabel } from '@/utils/dateUtils';
 import { ViewMode } from '@/types/gantt';
 
 export function GanttHeader() {
   const { state, setViewMode, navigate, goToToday } = useGantt();
-  const { theme, setTheme } = useTheme();
-  const pathname = usePathname();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
   };
 
-  const navItems = [
-    { href: '/', label: 'Timeline' },
-    // { href: '/statistic', label: 'Statistic' },
-  ];
-
   return (
-    <div className="flex flex-col">
-      {/* Top Navigation Bar */}
-      <div className="flex items-center justify-center bg-bg-secondary px-6 py-4">
-        <div className="flex items-center gap-16 rounded-xl bg-bg-tertiary p-2 ">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`rounded-lg px-8 py-2.5 text-base  font-semibold transition-all  ${
-                  isActive
-                    ? 'bg-bg-primary text-text-primary shadow-sm'
-                    : 'text-text-tertiary hover:text-text-primary'
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="flex items-center justify-between border-b border-border-primary bg-bg-primary px-6 py-4 mb-3">
+    <div className="flex items-center justify-between border-b border-border-primary bg-bg-primary px-6 py-4 mb-3">
       {/* Left: Logo & View Mode */}
       <div className="flex items-center gap-5">
         <div className="flex items-center gap-2">
@@ -118,24 +84,8 @@ export function GanttHeader() {
         </div>
       </div>
 
-      {/* Right: Theme Selector */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-text-tertiary">Theme</span>
-        <div className="flex items-center gap-1 rounded-lg bg-bg-tertiary p-1">
-          {THEMES.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTheme(t.id)}
-              className={`h-6 w-6 rounded-md ${
-                theme === t.id ? 'ring-2 ring-text-tertiary ring-offset-1' : ''
-              }`}
-              style={{ backgroundColor: t.color }}
-              title={t.name}
-            />
-          ))}
-        </div>
-      </div>
-      </div>
+      {/* Right: Empty space for balance */}
+      <div className="w-[120px]" />
     </div>
   );
 }
