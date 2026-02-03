@@ -5,13 +5,61 @@ import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task } from '@/types/gantt';
 import { formatDateShort, calculateProgress } from '@/utils/dateUtils';
 
+// Icons
+function ChevronIcon({ className, expanded }: { className?: string; expanded?: boolean }) {
+  return (
+    <svg className={`${className} transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function EditIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    </svg>
+  );
+}
+
+function TrashIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  );
+}
+
+function LinkIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+    </svg>
+  );
+}
+
+function ListIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+  );
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
 export function GanttTaskList() {
   const { state, selectTask, openForm, deleteTask } = useGantt();
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
-  const toggleExpand = (taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const toggleExpand = (taskId: string) => {
     setExpandedTasks((prev) => {
       const next = new Set(prev);
       if (next.has(taskId)) {
@@ -23,20 +71,17 @@ export function GanttTaskList() {
     });
   };
 
-  const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 52;
-  const CARD_HEIGHT = 30;
-  const CARD_TOP_OFFSET = 10;
 
   return (
-    <div className="w-80 flex-shrink-0 border-r border-border-primary bg-bg-secondary">
-      {/* Header - same height as timeline header */}
+    <div className="w-80 flex-shrink-0 border-r border-border-primary bg-bg-primary flex flex-col">
+      {/* Header */}
       <div
-        className="flex items-center justify-between border-b border-border-primary bg-bg-secondary px-4"
+        className="flex items-center justify-between border-b border-border-primary px-4"
         style={{ height: HEADER_HEIGHT }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-text-tertiary">Tasks</span>
+          <span className="text-sm font-semibold text-text-primary">Tasks</span>
           {state.tasks.length > 0 && (
             <span className="rounded-full bg-bg-tertiary px-2 py-0.5 text-xs font-semibold text-text-secondary">
               {state.tasks.length}
@@ -55,7 +100,7 @@ export function GanttTaskList() {
       </div>
 
       {/* Task List */}
-      <div className="overflow-auto" style={{ height: `calc(100% - ${HEADER_HEIGHT}px)` }}>
+      <div className="flex-1 overflow-auto">
         {state.tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center px-3">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary">
@@ -71,117 +116,135 @@ export function GanttTaskList() {
             {state.tasks.map((task) => {
               const progress = calculateProgress(task.startDate, task.endDate);
               const colors = TASK_COLORS[task.color];
-              const isSelected = state.selectedTaskId === task.id;
               const isExpanded = expandedTasks.has(task.id);
+              const dependencyNames = task.dependsOn.map(
+                (id) => state.tasks.find((t) => t.id === id)?.name || '?'
+              );
+              const subtasks = task.subtasks || [];
+              const completedSubs = subtasks.filter((s) => s.completed).length;
 
               return (
                 <div
                   key={task.id}
-                  className="relative"
-                  style={{ height: isExpanded ? 'auto' : ROW_HEIGHT }}
+                  className={`border-b border-border-primary transition-colors ${isExpanded ? 'bg-bg-secondary' : ''}`}
                 >
-                  {/* Row container with padding to align card */}
-                  <div className="px-3" style={{ paddingTop: CARD_TOP_OFFSET }}>
-                    {/* Card */}
-                    <div
-                      className={`cursor-pointer rounded-md border overflow-hidden transition-all ${colors.bg} ${colors.border} ${
-                        isSelected ? 'ring-2 ring-accent ring-offset-1 shadow-md' : 'hover:shadow-md'
-                      }`}
-                      onClick={(e) => {
-                        selectTask(task.id);
-                        toggleExpand(task.id, e);
-                      }}
-                    >
-                      {/* Card Header - Always visible, same height as timeline task bar */}
-                      <div
-                        className="flex items-center gap-1.5 px-2.5"
-                        style={{ height: CARD_HEIGHT }}
-                      >
-                        {/* Expand/Collapse indicator */}
-                        <svg
-                          className={`h-3 w-3 flex-shrink-0 transition-transform text-text-secondary ${isExpanded ? 'rotate-90' : ''}`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
+                  {/* Task Row */}
+                  <div
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer ${!isExpanded ? 'hover:bg-bg-hover' : ''}`}
+                    onClick={() => {
+                      selectTask(task.id);
+                      toggleExpand(task.id);
+                    }}
+                  >
+                    {/* Color indicator */}
+                    <div className={`h-8 w-1 rounded-full flex-shrink-0 ${colors.progress}`} />
 
-                        {/* Task name */}
-                        <span className="flex-1 truncate text-xs font-semibold text-text-primary">
-                          {task.name}
-                        </span>
+                    {/* Task name */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-text-primary truncate">{task.name}</div>
+                    </div>
 
-                        {/* Quick actions */}
-                        <div className="flex gap-0.5 flex-shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openForm(task);
-                            }}
-                            className="rounded p-1 text-text-secondary hover:bg-black/10"
-                          >
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setTaskToDelete(task);
-                            }}
-                            className="rounded p-1 text-text-secondary hover:bg-danger-light hover:text-danger"
-                          >
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                    {/* Progress and chevron */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="w-16 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                        <div className={`h-full ${colors.progress}`} style={{ width: `${progress}%` }} />
+                      </div>
+                      <span className="text-xs font-semibold text-text-secondary w-8">{progress}%</span>
+                      <ChevronIcon className="h-3.5 w-3.5 text-text-tertiary" expanded={isExpanded} />
+                    </div>
+                  </div>
+
+                  {/* Expanded Content */}
+                  {isExpanded && (
+                    <div className="px-4 pb-3">
+                      {/* Date Grid */}
+                      <div className="grid grid-cols-2 gap-2 text-center mb-2">
+                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                          <div className="text-xs font-bold text-text-primary">{formatDateShort(task.startDate)}</div>
+                          <div className="text-[9px] text-text-tertiary uppercase">Start</div>
+                        </div>
+                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                          <div className="text-xs font-bold text-text-primary">{formatDateShort(task.endDate)}</div>
+                          <div className="text-[9px] text-text-tertiary uppercase">End</div>
                         </div>
                       </div>
 
-                      {/* Expanded content */}
-                      {isExpanded && (
-                        <div className="border-t border-black/10 bg-bg-primary/60 p-2.5 space-y-2">
-                          {/* Dates */}
-                          <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span className="tabular-nums">{formatDateShort(task.startDate)}</span>
-                            <span className="text-text-tertiary">—</span>
-                            <span className="tabular-nums">{formatDateShort(task.endDate)}</span>
-                          </div>
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 gap-2 text-center mb-3">
+                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                          <div className="text-xs font-bold text-text-primary">{task.dependsOn.length}</div>
+                          <div className="text-[9px] text-text-tertiary uppercase">Dependencies</div>
+                        </div>
+                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                          <div className="text-xs font-bold text-text-primary">{completedSubs}/{subtasks.length}</div>
+                          <div className="text-[9px] text-text-tertiary uppercase">Subtasks</div>
+                        </div>
+                      </div>
 
-                          {/* Progress */}
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">Progress</span>
-                              <span className="text-xs font-bold tabular-nums text-text-secondary">{progress}%</span>
-                            </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-bg-tertiary">
-                              <div
-                                className={`h-full rounded-full ${colors.progress}`}
-                                style={{ width: `${progress}%` }}
-                              />
-                            </div>
+                      {/* Dependencies List */}
+                      {dependencyNames.length > 0 && (
+                        <div className="mb-2 p-2 bg-bg-primary rounded-lg border border-border-primary">
+                          <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
+                            <LinkIcon className="h-3 w-3" />
+                            Blocked by
                           </div>
-
-                          {/* Dependencies */}
-                          {task.dependsOn.length > 0 && (
-                            <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                              <svg className="h-3 w-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                              </svg>
-                              <span className="truncate">
-                                Depends on: {task.dependsOn.map((id) => state.tasks.find((t) => t.id === id)?.name || '?').join(', ')}
-                              </span>
-                            </div>
-                          )}
+                          <div className="space-y-1">
+                            {dependencyNames.map((name, i) => (
+                              <div key={i} className="text-xs text-text-secondary truncate">• {name}</div>
+                            ))}
+                          </div>
                         </div>
                       )}
+
+                      {/* Subtasks List */}
+                      {subtasks.length > 0 && (
+                        <div className="mb-3 p-2 bg-bg-primary rounded-lg border border-border-primary">
+                          <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
+                            <ListIcon className="h-3 w-3" />
+                            Subtasks
+                          </div>
+                          <div className="space-y-1">
+                            {subtasks.map((sub) => (
+                              <div key={sub.id} className="flex items-center gap-2 text-xs">
+                                <div className={`h-3 w-3 rounded border flex items-center justify-center ${
+                                  sub.completed ? 'bg-accent border-accent' : 'border-border-secondary'
+                                }`}>
+                                  {sub.completed && <CheckIcon className="h-2 w-2 text-accent-text" />}
+                                </div>
+                                <span className={sub.completed ? 'text-text-tertiary line-through' : 'text-text-secondary'}>
+                                  {sub.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTaskToDelete(task);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-danger bg-danger-light hover:bg-danger/20 rounded-lg transition-colors"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openForm(task);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-warning bg-warning-light hover:bg-warning/20 rounded-lg transition-colors"
+                        >
+                          <EditIcon className="h-3.5 w-3.5" />
+                          Edit
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
@@ -195,9 +258,7 @@ export function GanttTaskList() {
           <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl">
             <div className="p-6 text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-light">
-                <svg className="h-6 w-6 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <TrashIcon className="h-6 w-6 text-danger" />
               </div>
               <h3 className="mb-1 text-base font-bold text-text-primary">Delete Task</h3>
               <p className="mb-6 text-sm text-text-tertiary">

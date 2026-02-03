@@ -2,6 +2,12 @@ export type TaskColor = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' 
 
 export type ViewMode = 'month' | 'year';
 
+export interface Subtask {
+  id: string;
+  name: string;
+  completed: boolean;
+}
+
 export interface Task {
   id: string;
   name: string;
@@ -10,6 +16,7 @@ export interface Task {
   color: TaskColor;
   dependsOn: string[];
   blocked?: boolean;
+  subtasks?: Subtask[];
 }
 
 export interface GanttState {
