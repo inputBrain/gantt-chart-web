@@ -12,7 +12,7 @@ export function GanttHeader() {
   };
 
   return (
-    <div className="flex h-12 items-center justify-between border-b border-border-primary bg-bg-primary px-4">
+    <div className="flex h-12 items-center justify-center space-x-10 mt-16  border-b border-border-primary bg-bg-primary px-4">
       {/* Left: View Mode with underline */}
       <div className="flex items-center">
         <button

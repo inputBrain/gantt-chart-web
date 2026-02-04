@@ -6,7 +6,7 @@ import { getTimelineConfig, isWeekend, isToday, getDaysInMonth, getTaskPosition 
 import { GanttTaskBar } from './GanttTaskBar';
 import { GanttDependencyArrows } from './GanttDependencyArrows';
 
-const ROW_HEIGHT = 50;
+const ROW_HEIGHT = 57;
 const HEADER_HEIGHT = 52;
 
 export function GanttTimeline() {
