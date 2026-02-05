@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task } from '@/types/gantt';
-import { formatDateShort, calculateProgress } from '@/utils/dateUtils';
+import { formatDateShort, calculateTaskProgress } from '@/utils/dateUtils';
 
 // Icons
 function ChevronIcon({ className, expanded }: { className?: string; expanded?: boolean }) {
@@ -114,7 +114,7 @@ export function GanttTaskList() {
         ) : (
           <div>
             {state.tasks.map((task) => {
-              const progress = calculateProgress(task.startDate, task.endDate);
+              const progress = calculateTaskProgress(task.subtasks);
               const colors = TASK_COLORS[task.color];
               const isExpanded = expandedTasks.has(task.id);
               const dependencyNames = task.dependsOn.map(

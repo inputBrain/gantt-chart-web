@@ -38,7 +38,8 @@ export type GanttAction =
   | { type: 'SELECT_TASK'; payload: string | null }
   | { type: 'OPEN_FORM'; payload?: Task }
   | { type: 'CLOSE_FORM' }
-  | { type: 'SET_TASKS'; payload: Task[] };
+  | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'TOGGLE_SUBTASK'; payload: { taskId: string; subtaskId: string } };
 
 export interface TimelineConfig {
   startDate: Date;

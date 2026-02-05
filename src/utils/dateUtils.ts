@@ -135,19 +135,10 @@ export function getTimelineConfig(currentDate: Date, viewMode: ViewMode): Timeli
   }
 }
 
-export function calculateProgress(startDate: Date, endDate: Date): number {
-  const today = new Date();
-  const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const startNormalized = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const endNormalized = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-  if (todayNormalized < startNormalized) return 0;
-  if (todayNormalized > endNormalized) return 100;
-
-  const total = endNormalized.getTime() - startNormalized.getTime();
-  const elapsed = todayNormalized.getTime() - startNormalized.getTime();
-
-  return Math.round((elapsed / total) * 100);
+export function calculateTaskProgress(subtasks?: { completed: boolean }[]): number {
+  if (!subtasks || subtasks.length === 0) return 0;
+  const completed = subtasks.filter(s => s.completed).length;
+  return Math.round((completed / subtasks.length) * 100);
 }
 
 export function getTaskPosition(

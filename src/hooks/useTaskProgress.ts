@@ -2,10 +2,10 @@
 
 import { useMemo } from 'react';
 import { Task } from '@/types/gantt';
-import { calculateProgress } from '@/utils/dateUtils';
+import { calculateTaskProgress } from '@/utils/dateUtils';
 
 export function useTaskProgress(task: Task): number {
   return useMemo(() => {
-    return calculateProgress(task.startDate, task.endDate);
-  }, [task.startDate, task.endDate]);
+    return calculateTaskProgress(task.subtasks);
+  }, [task.subtasks]);
 }

@@ -145,6 +145,23 @@ function ganttReducer(state: GanttState, action: GanttAction): GanttState {
         ...state,
         tasks: action.payload,
       };
+    case 'TOGGLE_SUBTASK': {
+      const { taskId, subtaskId } = action.payload;
+      const newTasks = state.tasks.map((task) => {
+        if (task.id !== taskId) return task;
+        return {
+          ...task,
+          subtasks: (task.subtasks || []).map((sub) =>
+            sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
+          ),
+        };
+      });
+      saveTasksToStorage(newTasks);
+      return {
+        ...state,
+        tasks: newTasks,
+      };
+    }
     default:
       return state;
   }
@@ -162,6 +179,7 @@ interface GanttContextValue {
   selectTask: (id: string | null) => void;
   openForm: (task?: Task) => void;
   closeForm: () => void;
+  toggleSubtask: (taskId: string, subtaskId: string) => void;
 }
 
 const GanttContext = createContext<GanttContextValue | null>(null);
@@ -216,6 +234,10 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'CLOSE_FORM' });
   }, []);
 
+  const toggleSubtask = useCallback((taskId: string, subtaskId: string) => {
+    dispatch({ type: 'TOGGLE_SUBTASK', payload: { taskId, subtaskId } });
+  }, []);
+
   const value: GanttContextValue = {
     state,
     dispatch,
@@ -228,6 +250,7 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     selectTask,
     openForm,
     closeForm,
+    toggleSubtask,
   };
 
   return <GanttContext.Provider value={value}>{children}</GanttContext.Provider>;
