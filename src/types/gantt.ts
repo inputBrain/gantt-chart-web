@@ -6,6 +6,7 @@ export interface Subtask {
   id: string;
   name: string;
   completed: boolean;
+  comment?: string;
 }
 
 export interface Task {
@@ -39,7 +40,10 @@ export type GanttAction =
   | { type: 'OPEN_FORM'; payload?: Task }
   | { type: 'CLOSE_FORM' }
   | { type: 'SET_TASKS'; payload: Task[] }
-  | { type: 'TOGGLE_SUBTASK'; payload: { taskId: string; subtaskId: string } };
+  | { type: 'TOGGLE_SUBTASK'; payload: { taskId: string; subtaskId: string } }
+  | { type: 'UPDATE_SUBTASK'; payload: { taskId: string; subtask: Subtask } }
+  | { type: 'DELETE_SUBTASK'; payload: { taskId: string; subtaskId: string } }
+  | { type: 'REORDER_SUBTASKS'; payload: { taskId: string; fromIndex: number; toIndex: number } };
 
 export interface TimelineConfig {
   startDate: Date;

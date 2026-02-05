@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { GanttState, GanttAction, Task, ViewMode } from '@/types/gantt';
+import { GanttState, GanttAction, Task, ViewMode, Subtask } from '@/types/gantt';
 import { addMonths } from '@/utils/dateUtils';
 
 const STORAGE_KEY = 'gantt-tasks';
@@ -162,6 +162,56 @@ function ganttReducer(state: GanttState, action: GanttAction): GanttState {
         tasks: newTasks,
       };
     }
+    case 'UPDATE_SUBTASK': {
+      const { taskId, subtask } = action.payload;
+      const newTasks = state.tasks.map((task) => {
+        if (task.id !== taskId) return task;
+        return {
+          ...task,
+          subtasks: (task.subtasks || []).map((sub) =>
+            sub.id === subtask.id ? subtask : sub
+          ),
+        };
+      });
+      saveTasksToStorage(newTasks);
+      return {
+        ...state,
+        tasks: newTasks,
+      };
+    }
+    case 'DELETE_SUBTASK': {
+      const { taskId, subtaskId } = action.payload;
+      const newTasks = state.tasks.map((task) => {
+        if (task.id !== taskId) return task;
+        return {
+          ...task,
+          subtasks: (task.subtasks || []).filter((sub) => sub.id !== subtaskId),
+        };
+      });
+      saveTasksToStorage(newTasks);
+      return {
+        ...state,
+        tasks: newTasks,
+      };
+    }
+    case 'REORDER_SUBTASKS': {
+      const { taskId, fromIndex, toIndex } = action.payload;
+      const newTasks = state.tasks.map((task) => {
+        if (task.id !== taskId) return task;
+        const subtasks = [...(task.subtasks || [])];
+        const [removed] = subtasks.splice(fromIndex, 1);
+        subtasks.splice(toIndex, 0, removed);
+        return {
+          ...task,
+          subtasks,
+        };
+      });
+      saveTasksToStorage(newTasks);
+      return {
+        ...state,
+        tasks: newTasks,
+      };
+    }
     default:
       return state;
   }
@@ -180,6 +230,9 @@ interface GanttContextValue {
   openForm: (task?: Task) => void;
   closeForm: () => void;
   toggleSubtask: (taskId: string, subtaskId: string) => void;
+  updateSubtask: (taskId: string, subtask: Subtask) => void;
+  deleteSubtask: (taskId: string, subtaskId: string) => void;
+  reorderSubtasks: (taskId: string, fromIndex: number, toIndex: number) => void;
 }
 
 const GanttContext = createContext<GanttContextValue | null>(null);
@@ -238,6 +291,18 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'TOGGLE_SUBTASK', payload: { taskId, subtaskId } });
   }, []);
 
+  const updateSubtask = useCallback((taskId: string, subtask: Subtask) => {
+    dispatch({ type: 'UPDATE_SUBTASK', payload: { taskId, subtask } });
+  }, []);
+
+  const deleteSubtask = useCallback((taskId: string, subtaskId: string) => {
+    dispatch({ type: 'DELETE_SUBTASK', payload: { taskId, subtaskId } });
+  }, []);
+
+  const reorderSubtasks = useCallback((taskId: string, fromIndex: number, toIndex: number) => {
+    dispatch({ type: 'REORDER_SUBTASKS', payload: { taskId, fromIndex, toIndex } });
+  }, []);
+
   const value: GanttContextValue = {
     state,
     dispatch,
@@ -251,6 +316,9 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
     openForm,
     closeForm,
     toggleSubtask,
+    updateSubtask,
+    deleteSubtask,
+    reorderSubtasks,
   };
 
   return <GanttContext.Provider value={value}>{children}</GanttContext.Provider>;

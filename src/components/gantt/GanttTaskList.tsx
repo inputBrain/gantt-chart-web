@@ -207,9 +207,9 @@ export function GanttTaskList() {
                             {subtasks.map((sub) => (
                               <div key={sub.id} className="flex items-center gap-2 text-xs">
                                 <div className={`h-3 w-3 rounded border flex items-center justify-center ${
-                                  sub.completed ? 'bg-accent border-accent' : 'border-border-secondary'
+                                  sub.completed ? `${colors.progress} border-transparent` : 'border-border-secondary'
                                 }`}>
-                                  {sub.completed && <CheckIcon className="h-2 w-2 text-accent-text" />}
+                                  {sub.completed && <CheckIcon className="h-2 w-2 text-white" />}
                                 </div>
                                 <span className={sub.completed ? 'text-text-tertiary line-through' : 'text-text-secondary'}>
                                   {sub.name}
