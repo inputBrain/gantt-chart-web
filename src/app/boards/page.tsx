@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task, Subtask } from '@/types/gantt';
 import { calculateTaskProgress, formatDateShort } from '@/utils/dateUtils';
+import { generateUUID } from '@/utils/helpers';
 
 // Storage key for custom columns
 const COLUMNS_STORAGE_KEY = 'kanban-columns';
@@ -348,7 +349,7 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
     e.preventDefault();
     if (name.trim()) {
       onSave(task.id, {
-        id: subtask?.id || crypto.randomUUID(),
+        id: subtask?.id || generateUUID(),
         name: name.trim(),
         completed: subtask?.completed || false,
         comment: comment.trim() || undefined,
@@ -614,7 +615,7 @@ export default function BoardsPage() {
 
   const handleAddColumn = (title: string) => {
     const newColumn: Column = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       title,
       color: 'bg-accent',
     };
