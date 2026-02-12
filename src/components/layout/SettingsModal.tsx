@@ -7,11 +7,17 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-// Teams theme colors for display
-const TEAMS_THEME_COLORS: Record<string, string> = {
+// Dark theme colors for display
+const DARK_THEME_COLORS: Record<string, string> = {
   'teams-dark': '#1f1f1f',
   'teams-contrast': '#000000',
+  'dark-purpule': '#7c4dff',
 };
+
+// Light themes (excluding dark themes)
+const LIGHT_THEMES = THEMES.filter(t => t.id !== 'dark-purpule');
+// Dark theme from THEMES
+const DARK_PURPLE_THEME = THEMES.find(t => t.id === 'dark-purpule');
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
@@ -27,7 +33,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-md rounded-xl bg-bg-primary p-6 shadow-xl">
+      <div className="relative z-10 w-full max-w-md rounded-xl bg-bg-tertiary p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-text-primary">Settings</h2>
@@ -57,14 +63,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             Light Themes
           </label>
           <div className="grid grid-cols-4 gap-3">
-            {THEMES.map((t) => (
+            {LIGHT_THEMES.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 className={`flex flex-col items-center gap-2 rounded-lg p-3 transition-all ${
                   theme === t.id
-                    ? 'bg-bg-tertiary ring-2 ring-accent'
-                    : 'bg-bg-secondary hover:bg-bg-tertiary'
+                    ? 'bg-bg-hover ring-2 ring-accent'
+                    : 'bg-bg-secondary hover:bg-bg-hover'
                 }`}
               >
                 <div
@@ -79,25 +85,45 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </div>
         </div>
 
-        {/* Teams Themes Section */}
+        {/* Dark Themes Section */}
         <div className="mt-5 space-y-3">
           <label className="text-sm font-medium text-text-secondary">
-            Dark Themes (Teams)
+            Dark Themes
           </label>
           <div className="grid grid-cols-4 gap-3">
+            {/* Dark Purple Theme */}
+            {DARK_PURPLE_THEME && (
+              <button
+                onClick={() => setTheme(DARK_PURPLE_THEME.id)}
+                className={`flex flex-col items-center gap-2 rounded-lg p-3 transition-all ${
+                  theme === DARK_PURPLE_THEME.id
+                    ? 'bg-bg-hover ring-2 ring-accent'
+                    : 'bg-bg-secondary hover:bg-bg-hover'
+                }`}
+              >
+                <div
+                  className="h-8 w-8 rounded-full"
+                  style={{ backgroundColor: DARK_PURPLE_THEME.color }}
+                />
+                <span className="text-xs font-medium text-text-secondary">
+                  {DARK_PURPLE_THEME.name}
+                </span>
+              </button>
+            )}
+            {/* Teams Dark Themes */}
             {TEAMS_THEMES.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTheme(t.id as Theme)}
                 className={`flex flex-col items-center gap-2 rounded-lg p-3 transition-all ${
                   theme === t.id
-                    ? 'bg-bg-tertiary ring-2 ring-accent'
-                    : 'bg-bg-secondary hover:bg-bg-tertiary'
+                    ? 'bg-bg-hover ring-2 ring-accent'
+                    : 'bg-bg-secondary hover:bg-bg-hover'
                 }`}
               >
                 <div
                   className="h-8 w-8 rounded-full border border-border-secondary"
-                  style={{ backgroundColor: TEAMS_THEME_COLORS[t.id] }}
+                  style={{ backgroundColor: DARK_THEME_COLORS[t.id] }}
                 >
                   {t.id === 'teams-contrast' && (
                     <div className="h-full w-full rounded-full flex items-center justify-center">

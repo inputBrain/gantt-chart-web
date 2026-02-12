@@ -101,7 +101,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
           }`}
           onMouseDown={handleLeftHandleMouseDown}
         >
-          <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
+          <div className="absolute left-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.7)' }} />
         </div>
       )}
 
@@ -171,7 +171,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
 
         {/* Dropdown menu - positioned above */}
         {isMenuOpen && (
-          <div className="absolute bottom-full right-0 mb-1 min-w-[100px] rounded-md border border-border-primary bg-bg-primary shadow-lg">
+          <div className="absolute bottom-full right-0 mb-1 min-w-[100px] rounded-md border border-border-primary bg-bg-tertiary shadow-lg">
             <button
               onClick={handleToggleBlock}
               className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-text-primary hover:bg-bg-hover"
@@ -218,7 +218,7 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
           }`}
           onMouseDown={handleRightHandleMouseDown}
         >
-          <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white/70" />
+          <div className="absolute right-0.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.7)' }} />
         </div>
       )}
     </div>

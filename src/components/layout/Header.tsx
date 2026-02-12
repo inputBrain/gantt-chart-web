@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <>
-      <header className="flex h-14 items-center justify-between border-b border-border-primary bg-bg-primary px-6">
+      <header className="flex h-14 items-center justify-between border-b border-border-primary bg-bg-secondary px-6">
         <Logo />
 
         <nav className="flex items-center gap-1">

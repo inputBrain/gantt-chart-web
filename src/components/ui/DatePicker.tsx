@@ -111,7 +111,7 @@ export function DatePicker({ value, onChange, minDate, placeholder = 'Select dat
       {isOpen && dropdownPosition && (
         <div
           ref={dropdownRef}
-          className="fixed z-[9999] rounded-xl border border-border-primary bg-bg-primary p-3 shadow-xl"
+          className="fixed z-[9999] rounded-xl border border-border-primary bg-bg-tertiary p-3 shadow-xl"
           style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
         >
           <DayPicker

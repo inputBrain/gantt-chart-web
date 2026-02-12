@@ -104,7 +104,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
       {/* Delete confirmation modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
             <div className="p-6 text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-light">
                 <svg className="h-6 w-6 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -126,7 +126,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 <button
                   type="button"
                   onClick={confirmDelete}
-                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-white hover:opacity-90"
+                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-accent-text hover:opacity-90"
                 >
                   Delete
                 </button>
@@ -136,7 +136,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
         </div>
       )}
 
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
         {/* Header */}
         <div className="border-b border-border-primary bg-bg-secondary px-6 py-4">
           <div className="flex items-center justify-between">
@@ -298,7 +298,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 className={`relative h-6 w-11 rounded-full transition-colors ${blocked ? 'bg-accent' : 'bg-border-secondary'}`}
               >
                 <span
-                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${blocked ? 'left-[22px]' : 'left-0.5'}`}
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-bg-primary shadow transition-transform ${blocked ? 'left-[22px]' : 'left-0.5'}`}
                 />
               </button>
             </div>

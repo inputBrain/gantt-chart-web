@@ -74,7 +74,7 @@ export function GanttTaskList() {
   const HEADER_HEIGHT = 52;
 
   return (
-    <div className="w-80 flex-shrink-0 border-r border-border-primary bg-bg-primary flex flex-col">
+    <div className="w-80 flex-shrink-0 border-r border-border-primary bg-bg-secondary flex flex-col">
       {/* Header */}
       <div
         className="flex items-center justify-between border-b border-border-primary px-4"
@@ -169,11 +169,11 @@ export function GanttTaskList() {
                     <div className="px-4 pb-3">
                       {/* Date Grid */}
                       <div className="grid grid-cols-2 gap-2 text-center mb-2">
-                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
                           <div className="text-xs font-bold text-text-primary">{formatDateShort(task.startDate)}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Start</div>
                         </div>
-                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
                           <div className="text-xs font-bold text-text-primary">{formatDateShort(task.endDate)}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">End</div>
                         </div>
@@ -181,11 +181,11 @@ export function GanttTaskList() {
 
                       {/* Stats Grid */}
                       <div className="grid grid-cols-2 gap-2 text-center mb-3">
-                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
                           <div className="text-xs font-bold text-text-primary">{task.dependsOn.length}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Dependencies</div>
                         </div>
-                        <div className="bg-bg-primary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
                           <div className="text-xs font-bold text-text-primary">{completedSubs}/{subtasks.length}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Subtasks</div>
                         </div>
@@ -193,7 +193,7 @@ export function GanttTaskList() {
 
                       {/* Dependencies List */}
                       {dependencyNames.length > 0 && (
-                        <div className="mb-2 p-2 bg-bg-primary rounded-lg border border-border-primary">
+                        <div className="mb-2 p-2 bg-bg-tertiary rounded-lg border border-border-primary">
                           <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
                             <LinkIcon className="h-3 w-3" />
                             Blocked by
@@ -208,7 +208,7 @@ export function GanttTaskList() {
 
                       {/* Subtasks List */}
                       {subtasks.length > 0 && (
-                        <div className="mb-3 p-2 bg-bg-primary rounded-lg border border-border-primary">
+                        <div className="mb-3 p-2 bg-bg-tertiary rounded-lg border border-border-primary">
                           <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
                             <ListIcon className="h-3 w-3" />
                             Subtasks
@@ -222,7 +222,7 @@ export function GanttTaskList() {
                                   }`}
                                   style={sub.completed && colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
                                 >
-                                  {sub.completed && <CheckIcon className="h-2 w-2 text-white" />}
+                                  {sub.completed && <CheckIcon className="h-2 w-2 text-accent-text" />}
                                 </div>
                                 <span className={sub.completed ? 'text-text-tertiary line-through' : 'text-text-secondary'}>
                                   {sub.name}
@@ -268,7 +268,7 @@ export function GanttTaskList() {
       {/* Delete confirmation modal */}
       {taskToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
             <div className="p-6 text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-light">
                 <TrashIcon className="h-6 w-6 text-danger" />
@@ -291,7 +291,7 @@ export function GanttTaskList() {
                     deleteTask(taskToDelete.id);
                     setTaskToDelete(null);
                   }}
-                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-white hover:opacity-90"
+                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-accent-text hover:opacity-90"
                 >
                   Delete
                 </button>
