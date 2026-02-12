@@ -1,12 +1,24 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { TaskColor, TASK_COLORS, Task } from '@/types/gantt';
 import { formatDate, parseDate } from '@/utils/dateUtils';
 import { DatePicker } from '@/components/ui/DatePicker';
 
 const COLORS: TaskColor[] = ['blue', 'green', 'purple', 'orange', 'red', 'teal', 'pink', 'yellow'];
+
+// Mapping preset colors to hex for initial color picker value
+const COLOR_TO_HEX: Record<TaskColor, string> = {
+  blue: '#1e88e5',
+  green: '#0ecb81',
+  purple: '#7c3aed',
+  orange: '#f59e0b',
+  red: '#f6465d',
+  teal: '#14b8a6',
+  pink: '#ec4899',
+  yellow: '#eab308',
+};
 
 function getDefaultDates() {
   const today = new Date();
@@ -17,6 +29,7 @@ function getDefaultDates() {
 
 function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tasks: Task[] }) {
   const { addTask, updateTask, deleteTask, closeForm } = useGantt();
+  const colorPickerRef = useRef<HTMLInputElement>(null);
 
   const defaultDates = useMemo(() => getDefaultDates(), []);
 
@@ -28,6 +41,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
     editingTask ? formatDate(editingTask.endDate) : defaultDates.endDate
   );
   const [color, setColor] = useState<TaskColor>(editingTask?.color ?? 'blue');
+  const [customColor, setCustomColor] = useState<string | undefined>(editingTask?.customColor);
   const [dependsOn, setDependsOn] = useState<string[]>(editingTask?.dependsOn ?? []);
   const [blocked, setBlocked] = useState(editingTask?.blocked ?? false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -42,6 +56,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
       startDate: parseDate(startDate),
       endDate: parseDate(endDate),
       color,
+      customColor,
       dependsOn,
       blocked,
     };
@@ -51,6 +66,19 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
     } else {
       addTask(taskData);
     }
+  };
+
+  const handlePresetColorClick = (c: TaskColor) => {
+    setColor(c);
+    setCustomColor(undefined); // Clear custom color when selecting preset
+  };
+
+  const handleCustomColorClick = () => {
+    colorPickerRef.current?.click();
+  };
+
+  const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomColor(e.target.value);
   };
 
   const handleDelete = () => {
@@ -176,17 +204,43 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                 Color
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 {COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setColor(c)}
-                    className={`h-8 w-8 rounded-full ${TASK_COLORS[c].progress} ${
-                      color === c ? 'ring-2 ring-text-tertiary ring-offset-2 scale-110' : 'hover:scale-110'
+                    onClick={() => handlePresetColorClick(c)}
+                    className={`h-8 w-8 rounded-full ${TASK_COLORS[c].progress} transition-transform ${
+                      color === c && !customColor ? 'ring-2 ring-text-tertiary ring-offset-2 scale-110' : 'hover:scale-110'
                     }`}
                   />
                 ))}
+                {/* Custom color picker button */}
+                <button
+                  type="button"
+                  onClick={handleCustomColorClick}
+                  className={`relative h-8 w-8 rounded-full overflow-hidden transition-transform ${
+                    customColor ? 'ring-2 ring-text-tertiary ring-offset-2 scale-110' : 'hover:scale-110'
+                  }`}
+                  style={customColor ? { backgroundColor: customColor } : undefined}
+                  title="Custom color"
+                >
+                  {!customColor && (
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background: 'conic-gradient(from 0deg, #f6465d, #f59e0b, #eab308, #0ecb81, #14b8a6, #1e88e5, #7c3aed, #ec4899, #f6465d)'
+                      }}
+                    />
+                  )}
+                </button>
+                <input
+                  ref={colorPickerRef}
+                  type="color"
+                  value={customColor || COLOR_TO_HEX[color]}
+                  onChange={handleCustomColorChange}
+                  className="sr-only"
+                />
               </div>
             </div>
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useGantt } from '@/context/GanttContext';
-import { TASK_COLORS, Task } from '@/types/gantt';
+import { TASK_COLORS, Task, getTaskColorStyles } from '@/types/gantt';
 import { formatDateShort, calculateTaskProgress } from '@/utils/dateUtils';
 
 // Icons
@@ -115,7 +115,8 @@ export function GanttTaskList() {
           <div>
             {state.tasks.map((task) => {
               const progress = calculateTaskProgress(task.subtasks);
-              const colors = TASK_COLORS[task.color];
+              const colorStyles = getTaskColorStyles(task);
+              const colors = colorStyles.classes;
               const isExpanded = expandedTasks.has(task.id);
               const dependencyNames = task.dependsOn.map(
                 (id) => state.tasks.find((t) => t.id === id)?.name || '?'
@@ -137,7 +138,10 @@ export function GanttTaskList() {
                     }}
                   >
                     {/* Color indicator */}
-                    <div className={`h-8 w-1 rounded-full flex-shrink-0 ${colors.progress}`} />
+                    <div
+                      className={`h-8 w-1 rounded-full flex-shrink-0 ${colors.progress}`}
+                      style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
+                    />
 
                     {/* Task name */}
                     <div className="flex-1 min-w-0">
@@ -147,7 +151,13 @@ export function GanttTaskList() {
                     {/* Progress and chevron */}
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <div className="w-16 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-                        <div className={`h-full ${colors.progress}`} style={{ width: `${progress}%` }} />
+                        <div
+                          className={`h-full ${colors.progress}`}
+                          style={{
+                            width: `${progress}%`,
+                            ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor })
+                          }}
+                        />
                       </div>
                       <span className="text-xs font-semibold text-text-secondary w-8">{progress}%</span>
                       <ChevronIcon className="h-3.5 w-3.5 text-text-tertiary" expanded={isExpanded} />
@@ -206,9 +216,12 @@ export function GanttTaskList() {
                           <div className="space-y-1">
                             {subtasks.map((sub) => (
                               <div key={sub.id} className="flex items-center gap-2 text-xs">
-                                <div className={`h-3 w-3 rounded border flex items-center justify-center ${
-                                  sub.completed ? `${colors.progress} border-transparent` : 'border-border-secondary'
-                                }`}>
+                                <div
+                                  className={`h-3 w-3 rounded border flex items-center justify-center ${
+                                    sub.completed ? `${colors.progress} border-transparent` : 'border-border-secondary'
+                                  }`}
+                                  style={sub.completed && colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
+                                >
                                   {sub.completed && <CheckIcon className="h-2 w-2 text-white" />}
                                 </div>
                                 <span className={sub.completed ? 'text-text-tertiary line-through' : 'text-text-secondary'}>

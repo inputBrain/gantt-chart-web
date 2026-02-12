@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/context/ThemeContext";
-import { GanttProvider } from "@/context/GanttContext";
-import { Header } from "@/components/layout";
+import { AppProviders } from "@/components/providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gantt Chart",
-  description: "Project management Gantt chart application",
+  title: "Planify - Project Planning",
+  description: "Project planning with Gantt charts and Kanban boards",
 };
 
 export default function RootLayout({
@@ -30,12 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <GanttProvider>
-            <Header />
-            {children}
-          </GanttProvider>
-        </ThemeProvider>
+        <AppProviders>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

@@ -15,6 +15,7 @@ export interface Task {
   startDate: Date;
   endDate: Date;
   color: TaskColor;
+  customColor?: string; // Custom hex color (e.g., "#ff5500")
   dependsOn: string[];
   blocked?: boolean;
   subtasks?: Subtask[];
@@ -69,3 +70,28 @@ export const TASK_COLORS: Record<TaskColor, { bg: string; progress: string; bord
   pink: { bg: 'bg-task-pink-bg', progress: 'bg-task-pink', border: 'border-task-pink' },
   yellow: { bg: 'bg-task-yellow-bg', progress: 'bg-task-yellow', border: 'border-task-yellow' },
 };
+
+// Helper to get task color styles (supports custom colors)
+export function getTaskColorStyles(task: Task): { bgColor?: string; progressColor?: string; borderColor?: string; classes: { bg: string; progress: string; border: string } } {
+  if (task.customColor) {
+    // For custom colors, return inline styles
+    const lightenColor = (hex: string, percent: number) => {
+      const num = parseInt(hex.replace('#', ''), 16);
+      const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * percent));
+      const g = Math.min(255, Math.floor(((num >> 8) & 0x00FF) + (255 - ((num >> 8) & 0x00FF)) * percent));
+      const b = Math.min(255, Math.floor((num & 0x0000FF) + (255 - (num & 0x0000FF)) * percent));
+      return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+    };
+
+    return {
+      bgColor: lightenColor(task.customColor, 0.85),
+      progressColor: task.customColor,
+      borderColor: task.customColor,
+      classes: { bg: '', progress: '', border: '' }
+    };
+  }
+
+  return {
+    classes: TASK_COLORS[task.color]
+  };
+}

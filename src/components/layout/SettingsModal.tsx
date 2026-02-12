@@ -1,11 +1,17 @@
 'use client';
 
-import { useTheme, THEMES } from '@/context/ThemeContext';
+import { useTheme, THEMES, TEAMS_THEMES, Theme } from '@/context/ThemeContext';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+// Teams theme colors for display
+const TEAMS_THEME_COLORS: Record<string, string> = {
+  'teams-dark': '#1f1f1f',
+  'teams-contrast': '#000000',
+};
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
@@ -45,10 +51,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </button>
         </div>
 
-        {/* Theme Section */}
+        {/* Light Themes Section */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-text-secondary">
-            Theme
+            Light Themes
           </label>
           <div className="grid grid-cols-4 gap-3">
             {THEMES.map((t) => (
@@ -67,6 +73,40 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 />
                 <span className="text-xs font-medium text-text-secondary">
                   {t.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Teams Themes Section */}
+        <div className="mt-5 space-y-3">
+          <label className="text-sm font-medium text-text-secondary">
+            Dark Themes (Teams)
+          </label>
+          <div className="grid grid-cols-4 gap-3">
+            {TEAMS_THEMES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id as Theme)}
+                className={`flex flex-col items-center gap-2 rounded-lg p-3 transition-all ${
+                  theme === t.id
+                    ? 'bg-bg-tertiary ring-2 ring-accent'
+                    : 'bg-bg-secondary hover:bg-bg-tertiary'
+                }`}
+              >
+                <div
+                  className="h-8 w-8 rounded-full border border-border-secondary"
+                  style={{ backgroundColor: TEAMS_THEME_COLORS[t.id] }}
+                >
+                  {t.id === 'teams-contrast' && (
+                    <div className="h-full w-full rounded-full flex items-center justify-center">
+                      <div className="h-4 w-4 rounded-full bg-yellow-400" />
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs font-medium text-text-secondary">
+                  {t.name.replace('Teams ', '')}
                 </span>
               </button>
             ))}

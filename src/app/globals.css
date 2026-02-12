@@ -163,6 +163,110 @@
   --today-bg: #f5f5f5;
 }
 
+/* ===== Theme: Teams Dark ===== */
+[data-theme="teams-dark"] {
+  --bg-primary: #1f1f1f;
+  --bg-secondary: #141414;
+  --bg-tertiary: #292929;
+  --bg-hover: #3d3d3d;
+  --bg-active: #4a4a4a;
+
+  --border-primary: #3d3d3d;
+  --border-secondary: #4a4a4a;
+  --border-focus: #666666;
+
+  --text-primary: #ffffff;
+  --text-secondary: #d6d6d6;
+  --text-tertiary: #8a8a8a;
+  --text-quaternary: #5c5c5c;
+
+  --accent: #6264a7;
+  --accent-hover: #7b7dba;
+  --accent-light: #3d3d5c;
+  --accent-text: #ffffff;
+
+  --success: #92c353;
+  --success-light: #2d3b1f;
+  --danger: #c4314b;
+  --danger-light: #3b1f24;
+  --warning: #f2c744;
+  --warning-light: #3b351f;
+  --info: #6264a7;
+  --info-light: #2b2b4a;
+
+  --today: #6264a7;
+  --today-bg: #2b2b4a;
+
+  --task-blue: #6264a7;
+  --task-blue-bg: #2b2b4a;
+  --task-green: #92c353;
+  --task-green-bg: #2d3b1f;
+  --task-purple: #8764b8;
+  --task-purple-bg: #322b4a;
+  --task-orange: #f2c744;
+  --task-orange-bg: #3b351f;
+  --task-red: #c4314b;
+  --task-red-bg: #3b1f24;
+  --task-teal: #00b7c3;
+  --task-teal-bg: #1f3b3d;
+  --task-pink: #e959d9;
+  --task-pink-bg: #3b1f39;
+  --task-yellow: #f2c744;
+  --task-yellow-bg: #3b351f;
+}
+
+/* ===== Theme: Teams High Contrast ===== */
+[data-theme="teams-contrast"] {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --bg-tertiary: #1a1a1a;
+  --bg-hover: #333333;
+  --bg-active: #4d4d4d;
+
+  --border-primary: #ffffff;
+  --border-secondary: #ffffff;
+  --border-focus: #ffff00;
+
+  --text-primary: #ffffff;
+  --text-secondary: #ffffff;
+  --text-tertiary: #ffff00;
+  --text-quaternary: #00ffff;
+
+  --accent: #ffff00;
+  --accent-hover: #ffff66;
+  --accent-light: #333300;
+  --accent-text: #000000;
+
+  --success: #00ff00;
+  --success-light: #003300;
+  --danger: #ff0000;
+  --danger-light: #330000;
+  --warning: #ffff00;
+  --warning-light: #333300;
+  --info: #00ffff;
+  --info-light: #003333;
+
+  --today: #ffff00;
+  --today-bg: #333300;
+
+  --task-blue: #00ffff;
+  --task-blue-bg: #003333;
+  --task-green: #00ff00;
+  --task-green-bg: #003300;
+  --task-purple: #ff00ff;
+  --task-purple-bg: #330033;
+  --task-orange: #ffff00;
+  --task-orange-bg: #333300;
+  --task-red: #ff0000;
+  --task-red-bg: #330000;
+  --task-teal: #00ffff;
+  --task-teal-bg: #003333;
+  --task-pink: #ff00ff;
+  --task-pink-bg: #330033;
+  --task-yellow: #ffff00;
+  --task-yellow-bg: #333300;
+}
+
 @theme inline {
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);

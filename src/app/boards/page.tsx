@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useGantt } from '@/context/GanttContext';
-import { TASK_COLORS, Task, Subtask } from '@/types/gantt';
+import { TASK_COLORS, Task, Subtask, getTaskColorStyles } from '@/types/gantt';
 import { calculateTaskProgress, formatDateShort } from '@/utils/dateUtils';
 import { generateUUID } from '@/utils/helpers';
 
@@ -111,6 +111,7 @@ interface SubtaskItemProps {
   subtask: Subtask;
   index: number;
   colorClass: string;
+  colorStyle?: string;
   onToggle: (e: React.MouseEvent) => void;
   onClick: () => void;
   onDelete: (e: React.MouseEvent) => void;
@@ -124,6 +125,7 @@ function SubtaskItem({
   subtask,
   index,
   colorClass,
+  colorStyle,
   onToggle,
   onClick,
   onDelete,
@@ -156,6 +158,7 @@ function SubtaskItem({
             ? `${colorClass} border-transparent`
             : 'border-border-secondary hover:border-border-focus'
         }`}
+        style={subtask.completed && colorStyle ? { backgroundColor: colorStyle } : undefined}
       >
         {subtask.completed && <CheckIcon className="h-3 w-3 text-white" />}
       </button>
@@ -208,7 +211,8 @@ function TaskCard({
 }: TaskCardProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const progress = calculateTaskProgress(task.subtasks);
-  const colors = TASK_COLORS[task.color];
+  const colorStyles = getTaskColorStyles(task);
+  const colors = colorStyles.classes;
   const subtasks = task.subtasks || [];
   const completedCount = subtasks.filter(s => s.completed).length;
 
@@ -242,7 +246,10 @@ function TaskCard({
       <div className="p-4 border-b border-border-primary">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className={`h-10 w-1.5 rounded-full flex-shrink-0 ${colors.progress}`} />
+            <div
+              className={`h-10 w-1.5 rounded-full flex-shrink-0 ${colors.progress}`}
+              style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
+            />
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-text-primary truncate">{task.name}</h3>
               <div className="flex items-center gap-2 mt-1">
@@ -266,7 +273,10 @@ function TaskCard({
           <div className="flex-1 h-2 bg-bg-tertiary rounded-full overflow-hidden">
             <div
               className={`h-full ${colors.progress} transition-all duration-300`}
-              style={{ width: `${progress}%` }}
+              style={{
+                width: `${progress}%`,
+                ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor })
+              }}
             />
           </div>
           <span className="text-xs font-bold text-text-secondary tabular-nums w-12 text-right">
@@ -295,6 +305,7 @@ function TaskCard({
                   subtask={subtask}
                   index={index}
                   colorClass={colors.progress}
+                  colorStyle={colorStyles.progressColor}
                   onToggle={(e) => {
                     e.stopPropagation();
                     onToggleSubtask(task.id, subtask.id);
@@ -343,7 +354,8 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
   const [name, setName] = useState(subtask?.name || '');
   const [comment, setComment] = useState(subtask?.comment || '');
   const isEditing = !!subtask;
-  const colors = TASK_COLORS[task.color];
+  const colorStyles = getTaskColorStyles(task);
+  const colors = colorStyles.classes;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -363,7 +375,10 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl" onClick={e => e.stopPropagation()}>
         <form onSubmit={handleSubmit}>
           {/* Header with task color */}
-          <div className={`h-2 ${colors.progress}`} />
+          <div
+            className={`h-2 ${colors.progress}`}
+            style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
+          />
           <div className="p-6">
             <div className="flex items-start justify-between mb-4">
               <div>

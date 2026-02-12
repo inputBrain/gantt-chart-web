@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { useTaskDrag } from '@/hooks/useTaskDrag';
 import { useTaskProgress } from '@/hooks/useTaskProgress';
-import { Task, TimelineConfig, TASK_COLORS } from '@/types/gantt';
+import { Task, TimelineConfig, TASK_COLORS, getTaskColorStyles } from '@/types/gantt';
 
 interface GanttTaskBarProps {
   task: Task;
@@ -22,7 +22,8 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isSelected = state.selectedTaskId === task.id;
-  const colors = TASK_COLORS[task.color];
+  const colorStyles = getTaskColorStyles(task);
+  const colors = colorStyles.classes;
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -86,6 +87,8 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
         width: visibleWidth,
         top: position.top + 10,
         height: 30,
+        ...(colorStyles.bgColor && { backgroundColor: colorStyles.bgColor }),
+        ...(colorStyles.borderColor && { borderColor: colorStyles.borderColor }),
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
@@ -114,7 +117,11 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
         return progressPercent > 0 ? (
           <div
             className={`absolute left-0 top-0 h-full ${colors.progress} ${!isClippedLeft ? 'rounded-l-md' : ''}`}
-            style={{ width: `${progressPercent}%`, opacity: 0.35 }}
+            style={{
+              width: `${progressPercent}%`,
+              opacity: 0.35,
+              ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor })
+            }}
           />
         ) : null;
       })()}
