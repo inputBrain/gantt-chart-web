@@ -95,7 +95,7 @@ export function DatePicker({ value, onChange, minDate, placeholder = 'Select dat
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-left text-sm
-          ${displayValue ? 'text-text-primary' : 'text-text-quaternary'}
+          ${displayValue ? 'text-text-secondary' : 'text-text-quaternary'}
           hover:border-border-secondary focus:border-accent focus:outline-none`}
       >
         <div className="flex items-center justify-between">

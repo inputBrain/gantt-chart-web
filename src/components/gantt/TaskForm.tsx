@@ -165,7 +165,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-primary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none"
+                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-secondary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none"
                 placeholder="Enter task name"
                 required
                 autoFocus

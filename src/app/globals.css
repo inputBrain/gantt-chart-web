@@ -281,10 +281,10 @@
     --border-focus: #474F68;    /* бордери інпутів при hover */
 
     /* TEXT */
-    --text-primary: #96A0C5;    /* основний текст */
-    --text-secondary: #bdc8f0;
-    --text-tertiary: #8492c4;
-    --text-quaternary: #6b7599;
+    --text-primary: #D7DCEC;    /* заголовки (New Task, назви) */
+    --text-secondary: #BDC8F0;  /* текст в інпутах */
+    --text-tertiary: #8492C4;   /* labels інпутів (Task Name, Start Date тощо) */
+    --text-quaternary: #96A0C5; /* менш важливий текст */
 
     /* ACCENT */
     --accent: #2196F3;          /* активні лінки, підкреслення */
