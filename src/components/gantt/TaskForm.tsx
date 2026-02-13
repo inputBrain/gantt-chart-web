@@ -140,7 +140,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
         {/* Header */}
         <div className="border-b border-border-primary bg-bg-secondary px-6 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-text-primary">
+            <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">
               {editingTask ? 'Edit Task' : 'New Task'}
             </h2>
             <button
@@ -204,7 +204,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                 Color
               </label>
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center flex-wrap">
                 {COLORS.map((c) => (
                   <button
                     key={c}
@@ -215,15 +215,22 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                     }`}
                   />
                 ))}
-                {/* Custom color picker button */}
+              </div>
+            </div>
+
+            {/* Custom Color */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                Custom Color
+              </label>
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={handleCustomColorClick}
-                  className={`relative h-8 w-8 rounded-full overflow-hidden transition-transform ${
+                  className={`relative h-10 w-10 rounded-full overflow-hidden transition-transform ${
                     customColor ? 'ring-2 ring-text-tertiary ring-offset-2 scale-110' : 'hover:scale-110'
                   }`}
                   style={customColor ? { backgroundColor: customColor } : undefined}
-                  title="Custom color"
                 >
                   {!customColor && (
                     <div
@@ -234,6 +241,9 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                     />
                   )}
                 </button>
+                {customColor && (
+                  <span className="text-sm text-text-secondary font-mono">{customColor.toUpperCase()}</span>
+                )}
                 <input
                   ref={colorPickerRef}
                   type="color"
@@ -305,33 +315,31 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
           </div>
 
           {/* Actions */}
-          <div className="mt-6 flex items-center justify-between">
-            <div>
-              {editingTask && (
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="rounded-lg px-3 py-2 text-xs font-semibold text-danger hover:bg-danger-light"
-                >
-                  Delete Task
-                </button>
-              )}
-            </div>
-            <div className="flex gap-2">
+          <div className="mt-6 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={closeForm}
-                className="rounded-xl border border-border-primary bg-bg-primary px-5 py-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-hover"
+                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-xl bg-accent px-5 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover"
+                className="rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover"
               >
                 {editingTask ? 'Save Changes' : 'Create Task'}
               </button>
             </div>
+            {editingTask && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light"
+              >
+                Delete Task
+              </button>
+            )}
           </div>
         </form>
       </div>
