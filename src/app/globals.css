@@ -17,6 +17,7 @@
   --border-primary: #eaecef;
   --border-secondary: #e0e3e7;
   --border-focus: #b7bdc6;
+  --dependency: #a78bfa;        /* лінії залежностей (світлий фіолетовий для світлих тем) */
 
   --text-primary: #1e2329;
   --text-secondary: #474d57;
@@ -280,6 +281,7 @@
     --border-primary: #2a3352;
     --border-secondary: #3b4470;
     --border-focus: #474F68;    /* бордери інпутів при hover */
+    --dependency: #2196F3;      /* лінії залежностей */
 
     /* TEXT */
     --text-primary: #D7DCEC;    /* заголовки (New Task, назви) */
@@ -305,7 +307,7 @@
     /* TODAY - вертикальна полоска поточної дати та поточний місяць */
     --today: #D7DCEC;           /* вертикальна полоска = text-primary */
     --today-bg: #202054;        /* фон поточного місяця/дня */
-    --today-text: #7C4DFF;      /* текст поточного місяця (Feb, Jan тощо) */
+    --today-text: #2196F3;      /* текст поточного місяця (Feb, Jan тощо) */
 
     /* TASKS — комбінація primary/secondary палітри */
     --task-blue: #90caf9;       /* darkPrimary200 */
@@ -336,6 +338,7 @@
   --color-border-primary: var(--border-primary);
   --color-border-secondary: var(--border-secondary);
   --color-border-focus: var(--border-focus);
+  --color-dependency: var(--dependency);
 
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
