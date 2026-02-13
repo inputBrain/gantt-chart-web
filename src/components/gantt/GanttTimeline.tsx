@@ -105,7 +105,7 @@ export function GanttTimeline() {
                     }`}
                     style={{ flex: `0 0 ${monthWidth}px`, minWidth: monthWidth }}
                   >
-                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-today' : 'text-text-secondary'}`}>
+                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-today-text' : 'text-text-secondary'}`}>
                       {col.label}
                     </span>
                   </div>
