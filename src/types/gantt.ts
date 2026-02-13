@@ -74,18 +74,21 @@ export const TASK_COLORS: Record<TaskColor, { bg: string; progress: string; bord
 // Helper to get task color styles (supports custom colors)
 export function getTaskColorStyles(task: Task): { bgColor?: string; progressColor?: string; borderColor?: string; classes: { bg: string; progress: string; border: string } } {
   if (task.customColor) {
-    // For custom colors, return inline styles
-    const lightenColor = (hex: string, percent: number) => {
+    // For custom colors, style like preset colors:
+    // - Background: subtle version of the color (using transparency for theme compatibility)
+    // - Progress: full saturated color
+    // - Border: the custom color
+    const hexToRgba = (hex: string, alpha: number) => {
       const num = parseInt(hex.replace('#', ''), 16);
-      const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * percent));
-      const g = Math.min(255, Math.floor(((num >> 8) & 0x00FF) + (255 - ((num >> 8) & 0x00FF)) * percent));
-      const b = Math.min(255, Math.floor((num & 0x0000FF) + (255 - (num & 0x0000FF)) * percent));
-      return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+      const r = (num >> 16) & 0xFF;
+      const g = (num >> 8) & 0xFF;
+      const b = num & 0xFF;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
 
     return {
-      bgColor: lightenColor(task.customColor, 0.85),
-      progressColor: task.customColor,
+      bgColor: hexToRgba(task.customColor, 0.15),  // Subtle background with transparency
+      progressColor: task.customColor,             // Full color for progress
       borderColor: task.customColor,
       classes: { bg: '', progress: '', border: '' }
     };
