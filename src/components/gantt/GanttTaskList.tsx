@@ -127,7 +127,7 @@ export function GanttTaskList() {
               return (
                 <div
                   key={task.id}
-                  className={`border-b border-border-primary transition-colors ${isExpanded ? 'bg-bg-secondary' : ''}`}
+                  className={`border-b border-border-primary transition-colors ${isExpanded ? 'bg-card-expanded-bg' : ''}`}
                 >
                   {/* Task Row */}
                   <div
@@ -169,11 +169,11 @@ export function GanttTaskList() {
                     <div className="px-4 pb-3">
                       {/* Date Grid */}
                       <div className="grid grid-cols-2 gap-2 text-center mb-2">
-                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-card-content-bg rounded-lg p-2 border border-card-expanded-border">
                           <div className="text-xs font-bold text-text-primary">{formatDateShort(task.startDate)}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Start</div>
                         </div>
-                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-card-content-bg rounded-lg p-2 border border-card-expanded-border">
                           <div className="text-xs font-bold text-text-primary">{formatDateShort(task.endDate)}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">End</div>
                         </div>
@@ -181,11 +181,11 @@ export function GanttTaskList() {
 
                       {/* Stats Grid */}
                       <div className="grid grid-cols-2 gap-2 text-center mb-3">
-                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-card-content-bg rounded-lg p-2 border border-card-expanded-border">
                           <div className="text-xs font-bold text-text-primary">{task.dependsOn.length}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Dependencies</div>
                         </div>
-                        <div className="bg-bg-tertiary rounded-lg p-2 border border-border-primary">
+                        <div className="bg-card-content-bg rounded-lg p-2 border border-card-expanded-border">
                           <div className="text-xs font-bold text-text-primary">{completedSubs}/{subtasks.length}</div>
                           <div className="text-[9px] text-text-tertiary uppercase">Subtasks</div>
                         </div>
@@ -193,7 +193,7 @@ export function GanttTaskList() {
 
                       {/* Dependencies List */}
                       {dependencyNames.length > 0 && (
-                        <div className="mb-2 p-2 bg-bg-tertiary rounded-lg border border-border-primary">
+                        <div className="mb-2 p-2 bg-card-content-bg rounded-lg border border-card-expanded-border">
                           <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
                             <LinkIcon className="h-3 w-3" />
                             Blocked by
@@ -208,7 +208,7 @@ export function GanttTaskList() {
 
                       {/* Subtasks List */}
                       {subtasks.length > 0 && (
-                        <div className="mb-3 p-2 bg-bg-tertiary rounded-lg border border-border-primary">
+                        <div className="mb-3 p-2 bg-card-content-bg rounded-lg border border-card-expanded-border">
                           <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
                             <ListIcon className="h-3 w-3" />
                             Subtasks
