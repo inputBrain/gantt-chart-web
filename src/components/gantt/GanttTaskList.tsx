@@ -196,7 +196,7 @@ export function GanttTaskList() {
                         <div className="mb-2 p-2 bg-card-content-bg rounded-lg border border-card-expanded-border">
                           <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
                             <LinkIcon className="h-3 w-3" />
-                            Blocked by
+                            Depends on
                           </div>
                           <div className="space-y-1">
                             {dependencyNames.map((name, i) => (
