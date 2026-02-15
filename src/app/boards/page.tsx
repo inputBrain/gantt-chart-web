@@ -600,6 +600,10 @@ export default function BoardsPage() {
   const [addColumnModal, setAddColumnModal] = useState(false);
   const [editColumnModal, setEditColumnModal] = useState<Column | null>(null);
 
+  // Column drag state
+  const [draggedColumnIndex, setDraggedColumnIndex] = useState<number | null>(null);
+  const [dragOverColumnIndex, setDragOverColumnIndex] = useState<number | null>(null);
+
   // Load columns on mount
   useEffect(() => {
     setColumns(loadColumns());
@@ -652,6 +656,38 @@ export default function BoardsPage() {
     setColumns(columns.filter(c => c.id !== id));
   };
 
+  // Column drag handlers
+  const handleColumnDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedColumnIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleColumnDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (draggedColumnIndex !== null && draggedColumnIndex !== index) {
+      setDragOverColumnIndex(index);
+    }
+  };
+
+  const handleColumnDrop = (e: React.DragEvent, toIndex: number) => {
+    e.preventDefault();
+    if (draggedColumnIndex !== null && draggedColumnIndex !== toIndex) {
+      const newColumns = [...columns];
+      const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1);
+      newColumns.splice(toIndex, 0, draggedColumn);
+      setColumns(newColumns);
+    }
+    setDraggedColumnIndex(null);
+    setDragOverColumnIndex(null);
+  };
+
+  const handleColumnDragEnd = () => {
+    setDraggedColumnIndex(null);
+    setDragOverColumnIndex(null);
+  };
+
   // Filter tasks by progress for default columns, or show all for custom
   const getTasksForColumn = (column: Column) => {
     const progress = (t: Task) => calculateTaskProgress(t.subtasks);
@@ -693,14 +729,30 @@ export default function BoardsPage() {
           </div>
         ) : (
           <div className="flex gap-6 overflow-x-auto pb-4">
-            {columns.map((column) => {
+            {columns.map((column, index) => {
               const columnTasks = getTasksForColumn(column);
               const isDefaultColumn = ['todo', 'in-progress', 'done'].includes(column.id);
+              const isDragging = draggedColumnIndex === index;
+              const isDragOver = dragOverColumnIndex === index;
 
               return (
-                <div key={column.id} className="flex-shrink-0 w-80 space-y-4">
+                <div
+                  key={column.id}
+                  draggable
+                  onDragStart={(e) => handleColumnDragStart(e, index)}
+                  onDragOver={(e) => handleColumnDragOver(e, index)}
+                  onDrop={(e) => handleColumnDrop(e, index)}
+                  onDragEnd={handleColumnDragEnd}
+                  className={`flex-shrink-0 w-80 space-y-4 transition-all duration-200 ${
+                    isDragging ? 'opacity-50 scale-[0.98]' : ''
+                  } ${isDragOver ? 'transform translate-x-2' : ''}`}
+                >
                   {/* Column Header */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 group">
+                    {/* Drag Handle */}
+                    <div className="cursor-grab active:cursor-grabbing text-text-quaternary opacity-0 group-hover:opacity-100 transition-opacity">
+                      <DragIcon className="h-4 w-4" />
+                    </div>
                     <div className={`h-3 w-3 rounded-full ${column.color}`} />
                     <h2
                       className={`text-sm font-bold text-text-primary ${!isDefaultColumn ? 'cursor-pointer hover:text-accent' : ''}`}
