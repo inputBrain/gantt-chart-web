@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task, Subtask, getTaskColorStyles } from '@/types/gantt';
+import { TaskForm } from '@/components/gantt/TaskForm';
 import { calculateTaskProgress, formatDateShort } from '@/utils/dateUtils';
 import { generateUUID } from '@/utils/helpers';
 
@@ -430,31 +431,32 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
             </div>
           </div>
 
-          <div className="flex gap-3 p-4 border-t border-border-primary bg-bg-secondary">
+          <div className="p-4 border-t border-border-primary bg-bg-secondary space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!name.trim()}
+                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isEditing ? 'Save' : 'Add'}
+              </button>
+            </div>
             {isEditing && onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
+                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
               >
-                Delete
+                Delete Subtask
               </button>
             )}
-            <div className="flex-1" />
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-sm font-semibold text-text-secondary hover:bg-bg-hover"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!name.trim()}
-              className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isEditing ? 'Save' : 'Add'}
-            </button>
           </div>
         </form>
       </div>
@@ -493,21 +495,23 @@ function AddColumnModal({ onClose, onAdd }: AddColumnModalProps) {
               autoFocus
             />
           </div>
-          <div className="flex gap-3 p-4 border-t border-border-primary bg-bg-secondary">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-sm font-semibold text-text-secondary hover:bg-bg-hover"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!title.trim()}
-              className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Add
-            </button>
+          <div className="p-4 border-t border-border-primary bg-bg-secondary">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!title.trim()}
+                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -548,31 +552,32 @@ function EditColumnModal({ column, onClose, onSave, onDelete }: EditColumnModalP
               autoFocus
             />
           </div>
-          <div className="flex gap-3 p-4 border-t border-border-primary bg-bg-secondary">
+          <div className="p-4 border-t border-border-primary bg-bg-secondary space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!title.trim()}
+                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => {
                 onDelete(column.id);
                 onClose();
               }}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
+              className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
             >
-              Delete
-            </button>
-            <div className="flex-1" />
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-sm font-semibold text-text-secondary hover:bg-bg-hover"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!title.trim()}
-              className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Save
+              Delete Column
             </button>
           </div>
         </form>
@@ -780,6 +785,9 @@ export default function BoardsPage() {
           onDelete={handleDeleteColumn}
         />
       )}
+
+      {/* Task Form for editing main tasks */}
+      <TaskForm />
     </div>
   );
 }
