@@ -372,87 +372,89 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl" onClick={e => e.stopPropagation()}>
-        <form onSubmit={handleSubmit}>
-          {/* Header with task color */}
-          <div
-            className={`h-2 ${colors.progress}`}
-            style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
-          />
-          <div className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-base font-bold text-text-primary">
-                  {isEditing ? 'Edit Subtask' : 'Add Subtask'}
-                </h3>
-                <p className="text-sm text-text-tertiary mt-0.5">
-                  {isEditing ? 'Update' : 'Adding to'} <span className="font-medium text-text-secondary">{task.name}</span>
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-1 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
-              >
-                <XIcon className="h-5 w-5" />
-              </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
+        {/* Color bar */}
+        <div
+          className={`h-1 ${colors.progress}`}
+          style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
+        />
+
+        {/* Header */}
+        <div className="border-b border-border-primary bg-bg-secondary px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">
+                {isEditing ? 'Edit Subtask' : 'New Subtask'}
+              </h2>
+              <p className="text-xs text-text-tertiary mt-0.5">
+                {task.name}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary"
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="space-y-4">
+            {/* Name */}
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                Subtask Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter subtask name"
+                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-secondary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none"
+                autoFocus
+              />
             </div>
 
-            <div className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1.5">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter subtask name..."
-                  className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                  autoFocus
-                />
-              </div>
-
-              {/* Comment */}
-              <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1.5">
-                  Comment <span className="text-text-tertiary font-normal">(optional)</span>
-                </label>
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add a comment or description..."
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none"
-                />
-              </div>
+            {/* Comment */}
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                Comment <span className="normal-case font-normal">(optional)</span>
+              </label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Add a comment or description"
+                rows={3}
+                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-secondary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none resize-none"
+              />
             </div>
           </div>
-
-          <div className="p-4 border-t border-border-primary bg-bg-secondary space-y-3">
+          {/* Actions */}
+          <div className="mt-6 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
+                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isEditing ? 'Save' : 'Add'}
+                {isEditing ? 'Save Changes' : 'Create Subtask'}
               </button>
             </div>
             {isEditing && onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
-                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
+                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light transition-colors"
               >
                 Delete Subtask
               </button>
@@ -744,7 +746,10 @@ export default function BoardsPage() {
             })}
 
             {/* Add Column Button */}
-            <div className="flex-shrink-0 w-80">
+            <div className="flex-shrink-0 w-80 space-y-4">
+              {/* Empty header to align with other columns */}
+              <div className="h-[22px]" />
+              {/* Button at cards level */}
               <button
                 onClick={() => setAddColumnModal(true)}
                 className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-border-secondary text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
