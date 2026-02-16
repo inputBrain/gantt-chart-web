@@ -54,6 +54,14 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
+function DocumentIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
 export function GanttTaskList() {
   const { state, selectTask, openForm, deleteTask } = useGantt();
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
@@ -190,6 +198,17 @@ export function GanttTaskList() {
                           <div className="text-[9px] text-text-tertiary uppercase">Subtasks</div>
                         </div>
                       </div>
+
+                      {/* Description */}
+                      {task.description && (
+                        <div className="mb-2 p-2 bg-card-content-bg rounded-lg border border-card-expanded-border overflow-hidden">
+                          <div className="flex items-center gap-1.5 text-[10px] font-medium text-text-tertiary uppercase mb-1.5">
+                            <DocumentIcon className="h-3 w-3" />
+                            Description
+                          </div>
+                          <p className="text-xs text-text-secondary whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>{task.description}</p>
+                        </div>
+                      )}
 
                       {/* Dependencies List */}
                       {dependencyNames.length > 0 && (

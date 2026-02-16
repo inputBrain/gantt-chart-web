@@ -34,6 +34,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
   const defaultDates = useMemo(() => getDefaultDates(), []);
 
   const [name, setName] = useState(editingTask?.name ?? '');
+  const [description, setDescription] = useState(editingTask?.description ?? '');
   const [startDate, setStartDate] = useState(
     editingTask ? formatDate(editingTask.startDate) : defaultDates.startDate
   );
@@ -53,6 +54,7 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
 
     const taskData = {
       name: name.trim(),
+      description: description.trim() || undefined,
       startDate: parseDate(startDate),
       endDate: parseDate(endDate),
       color,
@@ -169,6 +171,20 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
                 placeholder="Enter task name"
                 required
                 autoFocus
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-secondary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none resize-none"
+                placeholder="Add task description or notes..."
+                rows={3}
               />
             </div>
 

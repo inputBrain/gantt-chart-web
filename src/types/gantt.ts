@@ -12,6 +12,7 @@ export interface Subtask {
 export interface Task {
   id: string;
   name: string;
+  description?: string; // Task description/notes
   startDate: Date;
   endDate: Date;
   color: TaskColor;
