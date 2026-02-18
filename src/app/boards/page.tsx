@@ -728,7 +728,7 @@ export default function BoardsPage() {
             <p className="mt-1 text-sm text-text-tertiary">Create a task on the Plan page first</p>
           </div>
         ) : (
-          <div className="flex gap-6 overflow-x-auto pb-4">
+          <div className="flex items-start gap-6 overflow-x-auto pb-4">
             {columns.map((column, index) => {
               const columnTasks = getTasksForColumn(column);
               const isDefaultColumn = ['todo', 'in-progress', 'done'].includes(column.id);
@@ -766,7 +766,7 @@ export default function BoardsPage() {
                     {!isDefaultColumn && (
                       <button
                         onClick={() => setEditColumnModal(column)}
-                        className="ml-auto p-1 rounded text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
+                        className="ml-auto px-1 rounded text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
                       >
                         <EditIcon className="h-4 w-4" />
                       </button>
@@ -799,15 +799,18 @@ export default function BoardsPage() {
 
             {/* Add Column Button */}
             <div className="flex-shrink-0 w-80 space-y-4">
-              {/* Empty header to align with other columns */}
-              <div className="h-[22px]" />
-              {/* Button at cards level */}
+              {/* Empty header matching column header structure */}
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4" />
+                <div className="h-3 w-3" />
+                <span className="text-sm font-bold invisible">Placeholder</span>
+              </div>
+              {/* Button matching "No tasks" placeholder */}
               <button
                 onClick={() => setAddColumnModal(true)}
-                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-border-secondary text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
+                className="w-full rounded-xl border border-dashed border-border-secondary p-6 text-center text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
               >
-                <PlusIcon className="h-5 w-5" />
-                <span className="text-sm font-medium">Add column</span>
+                <p className="text-xs font-medium">+ Add column</p>
               </button>
             </div>
           </div>
