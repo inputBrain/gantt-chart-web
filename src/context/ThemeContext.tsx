@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-export type Theme = 'yellow' | 'blue' | 'green' | 'neutral' | 'dark-purpule' | 'teams-dark' | 'teams-contrast';
+export type Theme = 'yellow' | 'blue' | 'green' | 'neutral' | 'dark-purpule' | 'dark-blue' | 'teams-dark' | 'teams-contrast';
 
 export const THEMES: { id: Theme; name: string; color: string }[] = [
   { id: 'yellow', name: 'Yellow', color: '#f0b90b' },
@@ -10,6 +10,7 @@ export const THEMES: { id: Theme; name: string; color: string }[] = [
   { id: 'green', name: 'Green', color: '#00c805' },
   { id: 'neutral', name: 'Neutral', color: '#171717' },
   { id: 'dark-purpule', name: 'Dark Purple', color: '#7c4dff' },
+  { id: 'dark-blue', name: 'Dark Blue', color: '#3b82f6' },
 ];
 
 // Teams-specific themes (not shown in settings, auto-applied)
