@@ -866,8 +866,209 @@ function SoloTeamSwitch({ value, onChange }: { value: 'solo' | 'team'; onChange:
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// ВАРІАНТИ КОНТРОЛІВ
+// ─────────────────────────────────────────────────────────────
+
+function ControlDemo({ label, desc, children }: { label: string; desc: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-bg-primary rounded-2xl border border-border-primary p-6 flex flex-col">
+      <span className="text-xs font-bold text-accent uppercase tracking-wider">{label}</span>
+      <p className="text-xs text-text-tertiary mt-0.5 mb-6">{desc}</p>
+      <div className="flex flex-col items-center gap-4 flex-1 justify-center">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// B — Оригінал: два pill tabs однакового стилю
+function ControlB() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-6 py-2 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-bg-primary text-text-primary shadow-sm border border-border-primary' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual <span className="text-success text-xs font-bold">−20%</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+// B1 — Один рядок: Solo·Team | Monthly·Annual в одній смузі
+function ControlB1() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-5 py-2 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-bg-primary text-text-primary shadow-sm border border-border-primary' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <div className="inline-flex items-center rounded-2xl bg-bg-tertiary p-1 gap-1">
+      <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+      <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      <div className="w-px h-4 bg-border-secondary mx-0.5" />
+      <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+      <button onClick={() => setAnnual(true)} className={pill(annual)}>
+        Annual <span className="text-success text-xs font-bold">−20%</span>
+      </button>
+    </div>
+  );
+}
+
+// B2 — Акцент: активна пілюля заповнена акцентним кольором
+function ControlB2() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-6 py-2 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-accent text-accent-text shadow-sm' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual{annual ? ' −20%' : <span className="text-success text-xs font-bold"> −20%</span>}
+        </button>
+      </div>
+    </>
+  );
+}
+
+// B3 — Capsule: повністю заокруглені (rounded-full)
+function ControlB3() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-6 py-2 rounded-full text-sm font-semibold transition-all ${active ? 'bg-bg-primary text-text-primary shadow-sm border border-border-primary' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-full bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-full bg-bg-tertiary p-1 gap-1">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual <span className="text-success text-xs font-bold">−20%</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+// B4 — Outlined: контейнер з бордером, активна з акцент-бордером
+function ControlB4() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-6 py-2 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-accent/10 text-accent border border-accent' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-2xl border border-border-primary p-1 gap-1">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-2xl border border-border-primary p-1 gap-1">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual <span className={annual ? 'text-xs font-bold' : 'text-success text-xs font-bold'}>−20%</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+// B5 — Compact: менший паддинг, дрібніший текст
+function ControlB5() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${active ? 'bg-bg-primary text-text-primary shadow-sm border border-border-primary' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-xl bg-bg-tertiary p-0.5 gap-0.5">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-xl bg-bg-tertiary p-0.5 gap-0.5">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual <span className="text-success font-bold">−20%</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+// B6 — Large: більший паддинг, більше повітря
+function ControlB6() {
+  const [mode, setMode] = useState<'solo' | 'team'>('solo');
+  const [annual, setAnnual] = useState(false);
+  const pill = (active: boolean) =>
+    `px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-bg-primary text-text-primary shadow border border-border-primary' : 'text-text-tertiary hover:text-text-secondary'}`;
+  return (
+    <>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1.5 gap-1">
+        <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
+        <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
+      </div>
+      <div className="inline-flex rounded-2xl bg-bg-tertiary p-1.5 gap-1">
+        <button onClick={() => setAnnual(false)} className={pill(!annual)}>Monthly</button>
+        <button onClick={() => setAnnual(true)} className={pill(annual)}>
+          Annual <span className="text-success text-xs font-bold">−20%</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+function ControlsShowcase() {
+  return (
+    <div className="py-8">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-text-primary">Варіації контролів на основі B</h2>
+        <p className="text-text-tertiary mt-2 text-sm">Клікай щоб побачити активний стан</p>
+      </div>
+      <div className="grid grid-cols-2 gap-5">
+        <ControlDemo label="B — Оригінал" desc="Два pill tabs однакового стилю, active: bg-primary + border">
+          <ControlB />
+        </ControlDemo>
+        <ControlDemo label="B1 — Один рядок" desc="Solo · Team | Monthly · Annual в одній pill-смузі">
+          <ControlB1 />
+        </ControlDemo>
+        <ControlDemo label="B2 — Акцент" desc="Active пілюля заповнена accent-кольором">
+          <ControlB2 />
+        </ControlDemo>
+        <ControlDemo label="B3 — Capsule" desc="Той самий стиль але з rounded-full — повністю круглі">
+          <ControlB3 />
+        </ControlDemo>
+        <ControlDemo label="B4 — Outlined" desc="Контейнер з бордером, active має accent-обводку">
+          <ControlB4 />
+        </ControlDemo>
+        <ControlDemo label="B5 — Compact" desc="Зменшений паддинг і шрифт, займає менше місця">
+          <ControlB5 />
+        </ControlDemo>
+        <ControlDemo label="B6 — Large" desc="Збільшений паддинг, більше повітря між кнопками">
+          <ControlB6 />
+        </ControlDemo>
+      </div>
+    </div>
+  );
+}
+
 export default function PreviewPricing() {
-  const [activeTab, setActiveTab] = useState<'v1' | 'v2' | 'v3' | 'both' | 'final'>('v1');
+  const [activeTab, setActiveTab] = useState<'v1' | 'v2' | 'v3' | 'both' | 'final' | 'controls'>('v1');
   const [annual, setAnnual] = useState(false);
   const [mode, setMode] = useState<'solo' | 'team'>('solo');
 
@@ -894,6 +1095,7 @@ export default function PreviewPricing() {
               { id: 'v3', label: 'V3 — Best Practices 2026' },
               { id: 'both', label: 'Порівняти' },
               { id: 'final', label: '✦ Фінал' },
+              { id: 'controls', label: 'Контроли' },
             ] as const).map(t => (
               <button
                 key={t.id}
@@ -908,7 +1110,7 @@ export default function PreviewPricing() {
               </button>
             ))}
           </div>
-          {activeTab !== 'final' && <Toggle annual={annual} setAnnual={setAnnual} />}
+          {activeTab !== 'final' && activeTab !== 'controls' && <Toggle annual={annual} setAnnual={setAnnual} />}
         </div>
 
         {/* V1 */}
@@ -966,6 +1168,13 @@ export default function PreviewPricing() {
                 annual={annual}
               />
             </div>
+          </div>
+        )}
+
+        {/* Контроли */}
+        {activeTab === 'controls' && (
+          <div className="bg-bg-primary rounded-2xl border border-border-primary p-8">
+            <ControlsShowcase />
           </div>
         )}
 
