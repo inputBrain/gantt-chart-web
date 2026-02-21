@@ -9,6 +9,7 @@ const navItems = [
   { href: '/', label: 'Plan' },
   { href: '/boards', label: 'Boards' },
   { href: '/statistics', label: 'Statistics' },
+  { href: '/pricing', label: 'Pricing' },
 ];
 
 function Logo() {
