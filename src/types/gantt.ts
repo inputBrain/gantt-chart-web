@@ -1,5 +1,16 @@
 export type TaskColor = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' | 'pink' | 'yellow';
 
+export type ProjectColor = 'blue' | 'yellow' | 'green' | 'purple' | 'orange' | 'red';
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  color: ProjectColor;
+  customColor?: string;
+  createdAt: string;
+}
+
 export type ViewMode = 'month' | 'year';
 
 export interface Subtask {

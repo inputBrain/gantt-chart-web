@@ -5,13 +5,6 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { SettingsModal } from './SettingsModal';
 
-const navItems = [
-  { href: '/', label: 'Plan' },
-  { href: '/boards', label: 'Boards' },
-  { href: '/statistics', label: 'Statistics' },
-  { href: '/pricing', label: 'Pricing' },
-];
-
 function Logo() {
   return (
     <div className="flex items-center gap-2.5">
@@ -25,6 +18,26 @@ function Logo() {
   );
 }
 
+function getNavItems(pathname: string) {
+  // Inside a project — show project-scoped tabs + Pricing
+  const match = pathname?.match(/^\/projects\/([^/]+)/);
+  if (match) {
+    const id = match[1];
+    return [
+      { href: '/',                          label: 'Projects' },
+      { href: `/projects/${id}`,            label: 'Gantt' },
+      { href: `/projects/${id}/boards`,     label: 'Boards' },
+      { href: `/projects/${id}/statistics`, label: 'Statistics' },
+      { href: '/pricing',                   label: 'Pricing' },
+    ];
+  }
+  // Top-level pages
+  return [
+    { href: '/',        label: 'Projects' },
+    { href: '/pricing', label: 'Pricing' },
+  ];
+}
+
 export function Header() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -34,10 +47,14 @@ export function Header() {
     return null;
   }
 
+  const navItems = getNavItems(pathname ?? '');
+
   return (
     <>
       <header className="flex h-14 items-center justify-between border-b border-border-primary bg-bg-secondary px-6">
-        <Logo />
+        <Link href="/">
+          <Logo />
+        </Link>
 
         <nav className="flex items-center gap-1">
           {navItems.map((item) => {

@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
-import { GanttProvider } from '@/context/GanttContext';
+import { ProjectsProvider } from '@/context/ProjectsContext';
 import { TeamsProvider, useTeams } from '@/context/TeamsContext';
 import { Header } from '@/components/layout';
 
@@ -24,7 +24,6 @@ function TeamsThemeBridge({ children }: { children: ReactNode }) {
 function ConditionalHeader() {
   const { isInTeams } = useTeams();
 
-
   if (isInTeams) {
     return null;
   }
@@ -38,10 +37,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <TeamsProvider>
         <TeamsThemeBridge>
-          <GanttProvider>
+          <ProjectsProvider>
             <ConditionalHeader />
             {children}
-          </GanttProvider>
+          </ProjectsProvider>
         </TeamsThemeBridge>
       </TeamsProvider>
     </ThemeProvider>

@@ -1,11 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { GanttState, GanttAction, Task, ViewMode, Subtask } from '@/types/gantt';
 import { addMonths } from '@/utils/dateUtils';
 import { generateUUID } from '@/utils/helpers';
-
-const STORAGE_KEY = 'gantt-tasks';
 
 function serializeTasks(tasks: Task[]): string {
   return JSON.stringify(
@@ -30,16 +28,126 @@ function deserializeTasks(json: string): Task[] {
   }
 }
 
-function loadTasksFromStorage(): Task[] {
+function loadTasksFromStorage(storageKey: string): Task[] {
   if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = localStorage.getItem(storageKey);
   if (!stored) return [];
   return deserializeTasks(stored);
 }
 
-function saveTasksToStorage(tasks: Task[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, serializeTasks(tasks));
+// Creates a reducer with the storage key baked in (avoids module-level global)
+function makeGanttReducer(storageKey: string) {
+  function save(tasks: Task[]): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(storageKey, serializeTasks(tasks));
+  }
+
+  return function ganttReducer(state: GanttState, action: GanttAction): GanttState {
+    switch (action.type) {
+      case 'ADD_TASK': {
+        const newTasks = [...state.tasks, action.payload];
+        save(newTasks);
+        return { ...state, tasks: newTasks, isFormOpen: false, editingTask: null };
+      }
+      case 'UPDATE_TASK': {
+        const newTasks = state.tasks.map((task) =>
+          task.id === action.payload.id ? action.payload : task
+        );
+        save(newTasks);
+        return { ...state, tasks: newTasks, isFormOpen: false, editingTask: null };
+      }
+      case 'DELETE_TASK': {
+        const newTasks = state.tasks
+          .filter((task) => task.id !== action.payload)
+          .map((task) => ({
+            ...task,
+            dependsOn: task.dependsOn.filter((id) => id !== action.payload),
+          }));
+        save(newTasks);
+        return {
+          ...state,
+          tasks: newTasks,
+          selectedTaskId: state.selectedTaskId === action.payload ? null : state.selectedTaskId,
+          isFormOpen: false,
+          editingTask: null,
+        };
+      }
+      case 'SET_VIEW_MODE':
+        return { ...state, viewMode: action.payload };
+      case 'NAVIGATE': {
+        const offset = action.payload === 'next' ? 1 : -1;
+        const newDate =
+          state.viewMode === 'month'
+            ? addMonths(state.currentDate, offset)
+            : new Date(state.currentDate.getFullYear() + offset, 0, 1);
+        return { ...state, currentDate: newDate };
+      }
+      case 'SET_CURRENT_DATE':
+        return { ...state, currentDate: action.payload };
+      case 'SELECT_TASK':
+        return { ...state, selectedTaskId: action.payload };
+      case 'OPEN_FORM':
+        return { ...state, isFormOpen: true, editingTask: action.payload || null };
+      case 'CLOSE_FORM':
+        return { ...state, isFormOpen: false, editingTask: null };
+      case 'SET_TASKS':
+        return { ...state, tasks: action.payload };
+      case 'TOGGLE_SUBTASK': {
+        const { taskId, subtaskId } = action.payload;
+        const newTasks = state.tasks.map((task) => {
+          if (task.id !== taskId) return task;
+          return {
+            ...task,
+            subtasks: (task.subtasks || []).map((sub) =>
+              sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
+            ),
+          };
+        });
+        save(newTasks);
+        return { ...state, tasks: newTasks };
+      }
+      case 'UPDATE_SUBTASK': {
+        const { taskId, subtask } = action.payload;
+        const newTasks = state.tasks.map((task) => {
+          if (task.id !== taskId) return task;
+          return {
+            ...task,
+            subtasks: (task.subtasks || []).map((sub) =>
+              sub.id === subtask.id ? subtask : sub
+            ),
+          };
+        });
+        save(newTasks);
+        return { ...state, tasks: newTasks };
+      }
+      case 'DELETE_SUBTASK': {
+        const { taskId, subtaskId } = action.payload;
+        const newTasks = state.tasks.map((task) => {
+          if (task.id !== taskId) return task;
+          return {
+            ...task,
+            subtasks: (task.subtasks || []).filter((sub) => sub.id !== subtaskId),
+          };
+        });
+        save(newTasks);
+        return { ...state, tasks: newTasks };
+      }
+      case 'REORDER_SUBTASKS': {
+        const { taskId, fromIndex, toIndex } = action.payload;
+        const newTasks = state.tasks.map((task) => {
+          if (task.id !== taskId) return task;
+          const subtasks = [...(task.subtasks || [])];
+          const [removed] = subtasks.splice(fromIndex, 1);
+          subtasks.splice(toIndex, 0, removed);
+          return { ...task, subtasks };
+        });
+        save(newTasks);
+        return { ...state, tasks: newTasks };
+      }
+      default:
+        return state;
+    }
+  };
 }
 
 const initialState: GanttState = {
@@ -50,161 +158,6 @@ const initialState: GanttState = {
   isFormOpen: false,
   editingTask: null,
 };
-
-function ganttReducer(state: GanttState, action: GanttAction): GanttState {
-  switch (action.type) {
-    case 'ADD_TASK': {
-      const newTasks = [...state.tasks, action.payload];
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-        isFormOpen: false,
-        editingTask: null,
-      };
-    }
-    case 'UPDATE_TASK': {
-      const newTasks = state.tasks.map((task) =>
-        task.id === action.payload.id ? action.payload : task
-      );
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-        isFormOpen: false,
-        editingTask: null,
-      };
-    }
-    case 'DELETE_TASK': {
-      const newTasks = state.tasks
-        .filter((task) => task.id !== action.payload)
-        .map((task) => ({
-          ...task,
-          dependsOn: task.dependsOn.filter((id) => id !== action.payload),
-        }));
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-        selectedTaskId: state.selectedTaskId === action.payload ? null : state.selectedTaskId,
-        isFormOpen: false,
-        editingTask: null,
-      };
-    }
-    case 'SET_VIEW_MODE':
-      return {
-        ...state,
-        viewMode: action.payload,
-      };
-    case 'NAVIGATE': {
-      const offset = action.payload === 'next' ? 1 : -1;
-      const newDate =
-        state.viewMode === 'month'
-          ? addMonths(state.currentDate, offset)
-          : new Date(state.currentDate.getFullYear() + offset, 0, 1);
-      return {
-        ...state,
-        currentDate: newDate,
-      };
-    }
-    case 'SET_CURRENT_DATE':
-      return {
-        ...state,
-        currentDate: action.payload,
-      };
-    case 'SELECT_TASK':
-      return {
-        ...state,
-        selectedTaskId: action.payload,
-      };
-    case 'OPEN_FORM':
-      return {
-        ...state,
-        isFormOpen: true,
-        editingTask: action.payload || null,
-      };
-    case 'CLOSE_FORM':
-      return {
-        ...state,
-        isFormOpen: false,
-        editingTask: null,
-      };
-    case 'SET_TASKS':
-      return {
-        ...state,
-        tasks: action.payload,
-      };
-    case 'TOGGLE_SUBTASK': {
-      const { taskId, subtaskId } = action.payload;
-      const newTasks = state.tasks.map((task) => {
-        if (task.id !== taskId) return task;
-        return {
-          ...task,
-          subtasks: (task.subtasks || []).map((sub) =>
-            sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
-          ),
-        };
-      });
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-      };
-    }
-    case 'UPDATE_SUBTASK': {
-      const { taskId, subtask } = action.payload;
-      const newTasks = state.tasks.map((task) => {
-        if (task.id !== taskId) return task;
-        return {
-          ...task,
-          subtasks: (task.subtasks || []).map((sub) =>
-            sub.id === subtask.id ? subtask : sub
-          ),
-        };
-      });
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-      };
-    }
-    case 'DELETE_SUBTASK': {
-      const { taskId, subtaskId } = action.payload;
-      const newTasks = state.tasks.map((task) => {
-        if (task.id !== taskId) return task;
-        return {
-          ...task,
-          subtasks: (task.subtasks || []).filter((sub) => sub.id !== subtaskId),
-        };
-      });
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-      };
-    }
-    case 'REORDER_SUBTASKS': {
-      const { taskId, fromIndex, toIndex } = action.payload;
-      const newTasks = state.tasks.map((task) => {
-        if (task.id !== taskId) return task;
-        const subtasks = [...(task.subtasks || [])];
-        const [removed] = subtasks.splice(fromIndex, 1);
-        subtasks.splice(toIndex, 0, removed);
-        return {
-          ...task,
-          subtasks,
-        };
-      });
-      saveTasksToStorage(newTasks);
-      return {
-        ...state,
-        tasks: newTasks,
-      };
-    }
-    default:
-      return state;
-  }
-}
 
 interface GanttContextValue {
   state: GanttState;
@@ -226,22 +179,32 @@ interface GanttContextValue {
 
 const GanttContext = createContext<GanttContextValue | null>(null);
 
-export function GanttProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(ganttReducer, initialState);
+export function GanttProvider({ children, projectId }: { children: React.ReactNode; projectId: string }) {
+  const storageKey = `planify-tasks-${projectId}`;
+
+  // Create reducer once with the storage key baked in
+  const reducerRef = useRef(makeGanttReducer(storageKey));
+  const [state, dispatch] = useReducer(reducerRef.current, initialState);
 
   useEffect(() => {
-    const tasks = loadTasksFromStorage();
+    // Migrate legacy 'gantt-tasks' key → 'planify-tasks-default'
+    if (projectId === 'default' && typeof window !== 'undefined') {
+      const legacyData = localStorage.getItem('gantt-tasks');
+      const newData = localStorage.getItem(storageKey);
+      if (legacyData && !newData) {
+        localStorage.setItem(storageKey, legacyData);
+        localStorage.removeItem('gantt-tasks');
+      }
+    }
+    const tasks = loadTasksFromStorage(storageKey);
     if (tasks.length > 0) {
       dispatch({ type: 'SET_TASKS', payload: tasks });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addTask = useCallback((task: Omit<Task, 'id'>) => {
-    const newTask: Task = {
-      ...task,
-      id: generateUUID(),
-    };
-    dispatch({ type: 'ADD_TASK', payload: newTask });
+    dispatch({ type: 'ADD_TASK', payload: { ...task, id: generateUUID() } });
   }, []);
 
   const updateTask = useCallback((task: Task) => {
@@ -293,21 +256,11 @@ export function GanttProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value: GanttContextValue = {
-    state,
-    dispatch,
-    addTask,
-    updateTask,
-    deleteTask,
-    setViewMode,
-    navigate,
-    goToToday,
-    selectTask,
-    openForm,
-    closeForm,
-    toggleSubtask,
-    updateSubtask,
-    deleteSubtask,
-    reorderSubtasks,
+    state, dispatch,
+    addTask, updateTask, deleteTask,
+    setViewMode, navigate, goToToday,
+    selectTask, openForm, closeForm,
+    toggleSubtask, updateSubtask, deleteSubtask, reorderSubtasks,
   };
 
   return <GanttContext.Provider value={value}>{children}</GanttContext.Provider>;

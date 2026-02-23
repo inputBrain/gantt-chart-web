@@ -80,7 +80,7 @@ export default function NotFound() {
           href="/"
           className="px-6 py-2.5 rounded-xl bg-accent text-accent-text text-sm font-semibold hover:bg-accent-hover transition-colors"
         >
-          Back to Plan
+          Back to Projects
         </Link>
         <Link
           href="/pricing"

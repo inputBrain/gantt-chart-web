@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task, Subtask, getTaskColorStyles } from '@/types/gantt';
 import { TaskForm } from '@/components/gantt/TaskForm';
 import { calculateTaskProgress, formatDateShort } from '@/utils/dateUtils';
 import { generateUUID } from '@/utils/helpers';
-
-// Storage key for custom columns
-const COLUMNS_STORAGE_KEY = 'kanban-columns';
 
 interface Column {
   id: string;
@@ -22,9 +20,9 @@ const DEFAULT_COLUMNS: Column[] = [
   { id: 'done', title: 'Completed', color: 'bg-success' },
 ];
 
-function loadColumns(): Column[] {
+function loadColumns(key: string): Column[] {
   if (typeof window === 'undefined') return DEFAULT_COLUMNS;
-  const stored = localStorage.getItem(COLUMNS_STORAGE_KEY);
+  const stored = localStorage.getItem(key);
   if (!stored) return DEFAULT_COLUMNS;
   try {
     return JSON.parse(stored);
@@ -33,9 +31,9 @@ function loadColumns(): Column[] {
   }
 }
 
-function saveColumns(columns: Column[]) {
+function saveColumns(key: string, columns: Column[]) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify(columns));
+  localStorage.setItem(key, JSON.stringify(columns));
 }
 
 function CheckIcon({ className }: { className?: string }) {
@@ -146,12 +144,9 @@ function SubtaskItem({
       }`}
       onClick={onClick}
     >
-      {/* Drag handle */}
       <div className="mt-1 cursor-grab active:cursor-grabbing text-text-quaternary opacity-0 group-hover:opacity-100 transition-opacity">
         <DragIcon className="h-4 w-4" />
       </div>
-
-      {/* Checkbox */}
       <button
         onClick={onToggle}
         className={`mt-0.5 h-5 w-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all ${
@@ -163,12 +158,8 @@ function SubtaskItem({
       >
         {subtask.completed && <CheckIcon className="h-3 w-3 text-white" />}
       </button>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
-        <span className={`text-sm block ${
-          subtask.completed ? 'text-text-tertiary line-through' : 'text-text-primary'
-        }`}>
+        <span className={`text-sm block ${subtask.completed ? 'text-text-tertiary line-through' : 'text-text-primary'}`}>
           {subtask.name}
         </span>
         {subtask.comment && (
@@ -178,8 +169,6 @@ function SubtaskItem({
           </div>
         )}
       </div>
-
-      {/* Delete */}
       <button
         onClick={onDelete}
         className="p-1 rounded text-text-quaternary opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-danger-light transition-all"
@@ -237,13 +226,8 @@ function TaskCard({
     setDragIndex(null);
   };
 
-  const handleDragEnd = () => {
-    setDragIndex(null);
-  };
-
   return (
     <div className="bg-bg-primary rounded-xl border border-border-primary shadow-sm hover:shadow-md transition-shadow">
-      {/* Header */}
       <div className="p-4 border-b border-border-primary">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -268,35 +252,23 @@ function TaskCard({
             <EditIcon className="h-4 w-4" />
           </button>
         </div>
-
-        {/* Progress */}
         <div className="mt-3 flex items-center gap-3">
           <div className="flex-1 h-2 bg-bg-tertiary rounded-full overflow-hidden">
             <div
               className={`h-full ${colors.progress} transition-all duration-300`}
-              style={{
-                width: `${progress}%`,
-                ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor })
-              }}
+              style={{ width: `${progress}%`, ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor }) }}
             />
           </div>
-          <span className="text-xs font-bold text-text-secondary tabular-nums w-12 text-right">
-            {progress}%
-          </span>
+          <span className="text-xs font-bold text-text-secondary tabular-nums w-12 text-right">{progress}%</span>
         </div>
       </div>
 
-      {/* Subtasks */}
-      <div className="p-3" onDragEnd={handleDragEnd}>
+      <div className="p-3" onDragEnd={() => setDragIndex(null)}>
         {subtasks.length > 0 ? (
           <>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">
-                Subtasks
-              </span>
-              <span className="text-xs font-semibold text-text-secondary">
-                {completedCount}/{subtasks.length}
-              </span>
+              <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">Subtasks</span>
+              <span className="text-xs font-semibold text-text-secondary">{completedCount}/{subtasks.length}</span>
             </div>
             <div className="space-y-0.5">
               {subtasks.map((subtask, index) => (
@@ -307,15 +279,9 @@ function TaskCard({
                   index={index}
                   colorClass={colors.progress}
                   colorStyle={colorStyles.progressColor}
-                  onToggle={(e) => {
-                    e.stopPropagation();
-                    onToggleSubtask(task.id, subtask.id);
-                  }}
+                  onToggle={(e) => { e.stopPropagation(); onToggleSubtask(task.id, subtask.id); }}
                   onClick={() => onEditSubtask(task, subtask)}
-                  onDelete={(e) => {
-                    e.stopPropagation();
-                    onDeleteSubtask(task.id, subtask.id);
-                  }}
+                  onDelete={(e) => { e.stopPropagation(); onDeleteSubtask(task.id, subtask.id); }}
                   onDragStart={handleDragStart}
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
@@ -329,8 +295,6 @@ function TaskCard({
             <p className="text-xs text-text-tertiary mb-2">No subtasks yet</p>
           </div>
         )}
-
-        {/* Add subtask button - accent color on hover */}
         <button
           onClick={() => onAddSubtask(task)}
           className="w-full mt-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-border-secondary text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
@@ -374,40 +338,24 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
-        {/* Color bar */}
-        <div
-          className={`h-1 ${colors.progress}`}
-          style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined}
-        />
-
-        {/* Header */}
+        <div className={`h-1 ${colors.progress}`} style={colorStyles.progressColor ? { backgroundColor: colorStyles.progressColor } : undefined} />
         <div className="border-b border-border-primary bg-bg-secondary px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">
                 {isEditing ? 'Edit Subtask' : 'New Subtask'}
               </h2>
-              <p className="text-xs text-text-tertiary mt-0.5">
-                {task.name}
-              </p>
+              <p className="text-xs text-text-tertiary mt-0.5">{task.name}</p>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary"
-            >
+            <button type="button" onClick={onClose} className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
               <XIcon className="h-5 w-5" />
             </button>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
-            {/* Name */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-                Subtask Name
-              </label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">Subtask Name</label>
               <input
                 type="text"
                 value={name}
@@ -417,8 +365,6 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
                 autoFocus
               />
             </div>
-
-            {/* Comment */}
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                 Comment <span className="normal-case font-normal">(optional)</span>
@@ -432,30 +378,17 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
               />
             </div>
           </div>
-          {/* Actions */}
           <div className="mt-6 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
-              >
+              <button type="button" onClick={onClose} className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover">
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={!name.trim()}
-                className="rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+              <button type="submit" disabled={!name.trim()} className="rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed">
                 {isEditing ? 'Save Changes' : 'Create Subtask'}
               </button>
             </div>
             {isEditing && onDelete && (
-              <button
-                type="button"
-                onClick={onDelete}
-                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light transition-colors"
-              >
+              <button type="button" onClick={onDelete} className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light transition-colors">
                 Delete Subtask
               </button>
             )}
@@ -466,53 +399,24 @@ function SubtaskModal({ task, subtask, onClose, onSave, onDelete }: SubtaskModal
   );
 }
 
-interface AddColumnModalProps {
-  onClose: () => void;
-  onAdd: (title: string) => void;
-}
-
-function AddColumnModal({ onClose, onAdd }: AddColumnModalProps) {
+function AddColumnModal({ onClose, onAdd }: { onClose: () => void; onAdd: (title: string) => void }) {
   const [title, setTitle] = useState('');
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim()) {
-      onAdd(title.trim());
-      onClose();
-    }
+    if (title.trim()) { onAdd(title.trim()); onClose(); }
   };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl" onClick={e => e.stopPropagation()}>
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <h3 className="text-base font-bold text-text-primary mb-4">Add Column</h3>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Column name..."
-              className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-              autoFocus
-            />
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Column name..." className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" autoFocus />
           </div>
           <div className="p-4 border-t border-border-primary bg-bg-secondary">
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={!title.trim()}
-                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add
-              </button>
+              <button type="button" onClick={onClose} className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover">Cancel</button>
+              <button type="submit" disabled={!title.trim()} className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed">Add</button>
             </div>
           </div>
         </form>
@@ -521,64 +425,26 @@ function AddColumnModal({ onClose, onAdd }: AddColumnModalProps) {
   );
 }
 
-interface EditColumnModalProps {
-  column: Column;
-  onClose: () => void;
-  onSave: (id: string, title: string) => void;
-  onDelete: (id: string) => void;
-}
-
-function EditColumnModal({ column, onClose, onSave, onDelete }: EditColumnModalProps) {
+function EditColumnModal({ column, onClose, onSave, onDelete }: { column: Column; onClose: () => void; onSave: (id: string, title: string) => void; onDelete: (id: string) => void }) {
   const [title, setTitle] = useState(column.title);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim()) {
-      onSave(column.id, title.trim());
-      onClose();
-    }
+    if (title.trim()) { onSave(column.id, title.trim()); onClose(); }
   };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-primary shadow-2xl" onClick={e => e.stopPropagation()}>
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <h3 className="text-base font-bold text-text-primary mb-4">Edit Column</h3>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Column name..."
-              className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-              autoFocus
-            />
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Column name..." className="w-full px-4 py-3 rounded-xl border border-border-primary bg-bg-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" autoFocus />
           </div>
           <div className="p-4 border-t border-border-primary bg-bg-secondary space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={!title.trim()}
-                className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Save
-              </button>
+              <button type="button" onClick={onClose} className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover">Cancel</button>
+              <button type="submit" disabled={!title.trim()} className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-text hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed">Save</button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                onDelete(column.id);
-                onClose();
-              }}
-              className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger-light transition-colors"
-            >
+            <button type="button" onClick={() => { onDelete(column.id); onClose(); }} className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger-light transition-colors">
               Delete Column
             </button>
           </div>
@@ -589,46 +455,37 @@ function EditColumnModal({ column, onClose, onSave, onDelete }: EditColumnModalP
 }
 
 export default function BoardsPage() {
+  const params = useParams();
+  const projectId = params.id as string;
+  const columnsKey = `kanban-columns-${projectId}`;
+
   const { state, toggleSubtask, updateSubtask, deleteSubtask, reorderSubtasks, updateTask, openForm } = useGantt();
 
-  // Columns state
   const [columns, setColumns] = useState<Column[]>(DEFAULT_COLUMNS);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // Modal states
   const [subtaskModal, setSubtaskModal] = useState<{ task: Task; subtask?: Subtask } | null>(null);
   const [addColumnModal, setAddColumnModal] = useState(false);
   const [editColumnModal, setEditColumnModal] = useState<Column | null>(null);
-
-  // Column drag state
   const [draggedColumnIndex, setDraggedColumnIndex] = useState<number | null>(null);
   const [dragOverColumnIndex, setDragOverColumnIndex] = useState<number | null>(null);
 
-  // Load columns on mount
   useEffect(() => {
-    setColumns(loadColumns());
+    setColumns(loadColumns(columnsKey));
     setIsLoaded(true);
-  }, []);
+  }, [columnsKey]);
 
-  // Save columns when changed
   useEffect(() => {
-    if (isLoaded) {
-      saveColumns(columns);
-    }
-  }, [columns, isLoaded]);
+    if (isLoaded) saveColumns(columnsKey, columns);
+  }, [columns, isLoaded, columnsKey]);
 
   const handleSaveSubtask = (taskId: string, subtask: Subtask) => {
     const task = state.tasks.find(t => t.id === taskId);
     if (!task) return;
-
     const existingSubtask = task.subtasks?.find(s => s.id === subtask.id);
     if (existingSubtask) {
       updateSubtask(taskId, subtask);
     } else {
-      updateTask({
-        ...task,
-        subtasks: [...(task.subtasks || []), subtask],
-      });
+      updateTask({ ...task, subtasks: [...(task.subtasks || []), subtask] });
     }
   };
 
@@ -640,12 +497,7 @@ export default function BoardsPage() {
   };
 
   const handleAddColumn = (title: string) => {
-    const newColumn: Column = {
-      id: generateUUID(),
-      title,
-      color: 'bg-accent',
-    };
-    setColumns([...columns, newColumn]);
+    setColumns([...columns, { id: generateUUID(), title, color: 'bg-accent' }]);
   };
 
   const handleEditColumn = (id: string, title: string) => {
@@ -656,7 +508,6 @@ export default function BoardsPage() {
     setColumns(columns.filter(c => c.id !== id));
   };
 
-  // Column drag handlers
   const handleColumnDragStart = (e: React.DragEvent, index: number) => {
     setDraggedColumnIndex(index);
     e.dataTransfer.effectAllowed = 'move';
@@ -666,54 +517,36 @@ export default function BoardsPage() {
   const handleColumnDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    if (draggedColumnIndex !== null && draggedColumnIndex !== index) {
-      setDragOverColumnIndex(index);
-    }
+    if (draggedColumnIndex !== null && draggedColumnIndex !== index) setDragOverColumnIndex(index);
   };
 
   const handleColumnDrop = (e: React.DragEvent, toIndex: number) => {
     e.preventDefault();
     if (draggedColumnIndex !== null && draggedColumnIndex !== toIndex) {
       const newColumns = [...columns];
-      const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1);
-      newColumns.splice(toIndex, 0, draggedColumn);
+      const [col] = newColumns.splice(draggedColumnIndex, 1);
+      newColumns.splice(toIndex, 0, col);
       setColumns(newColumns);
     }
     setDraggedColumnIndex(null);
     setDragOverColumnIndex(null);
   };
 
-  const handleColumnDragEnd = () => {
-    setDraggedColumnIndex(null);
-    setDragOverColumnIndex(null);
-  };
-
-  // Filter tasks by progress for default columns, or show all for custom
   const getTasksForColumn = (column: Column) => {
     const progress = (t: Task) => calculateTaskProgress(t.subtasks);
-
     switch (column.id) {
-      case 'todo':
-        return state.tasks.filter(t => progress(t) === 0);
-      case 'in-progress':
-        return state.tasks.filter(t => {
-          const p = progress(t);
-          return p > 0 && p < 100;
-        });
-      case 'done':
-        return state.tasks.filter(t => progress(t) === 100);
-      default:
-        // Custom columns - for now empty (could be extended for manual task assignment)
-        return [];
+      case 'todo': return state.tasks.filter(t => progress(t) === 0);
+      case 'in-progress': return state.tasks.filter(t => { const p = progress(t); return p > 0 && p < 100; });
+      case 'done': return state.tasks.filter(t => progress(t) === 100);
+      default: return [];
     }
   };
 
   return (
     <div className="min-h-screen bg-bg-secondary">
       <div className="max-w-full mx-auto p-6">
-        {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-text-primary">Boards</h1>
+          <h1 className="text-xl font-bold text-text-primary">Board</h1>
           <p className="text-sm text-text-tertiary mt-1">Manage your tasks and subtasks</p>
         </div>
 
@@ -725,7 +558,7 @@ export default function BoardsPage() {
               </svg>
             </div>
             <p className="text-base font-semibold text-text-secondary">No tasks yet</p>
-            <p className="mt-1 text-sm text-text-tertiary">Create a task on the Plan page first</p>
+            <p className="mt-1 text-sm text-text-tertiary">Go to the Gantt view to create your first task</p>
           </div>
         ) : (
           <div className="flex items-start gap-6 overflow-x-auto pb-4">
@@ -742,14 +575,10 @@ export default function BoardsPage() {
                   onDragStart={(e) => handleColumnDragStart(e, index)}
                   onDragOver={(e) => handleColumnDragOver(e, index)}
                   onDrop={(e) => handleColumnDrop(e, index)}
-                  onDragEnd={handleColumnDragEnd}
-                  className={`flex-shrink-0 w-80 space-y-4 transition-all duration-200 ${
-                    isDragging ? 'opacity-50 scale-[0.98]' : ''
-                  } ${isDragOver ? 'transform translate-x-2' : ''}`}
+                  onDragEnd={() => { setDraggedColumnIndex(null); setDragOverColumnIndex(null); }}
+                  className={`flex-shrink-0 w-80 space-y-4 transition-all duration-200 ${isDragging ? 'opacity-50 scale-[0.98]' : ''} ${isDragOver ? 'transform translate-x-2' : ''}`}
                 >
-                  {/* Column Header */}
                   <div className="flex items-center gap-2 group">
-                    {/* Drag Handle */}
                     <div className="cursor-grab active:cursor-grabbing text-text-quaternary opacity-0 group-hover:opacity-100 transition-opacity">
                       <DragIcon className="h-4 w-4" />
                     </div>
@@ -764,16 +593,12 @@ export default function BoardsPage() {
                       {columnTasks.length}
                     </span>
                     {!isDefaultColumn && (
-                      <button
-                        onClick={() => setEditColumnModal(column)}
-                        className="ml-auto px-1 rounded text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
-                      >
+                      <button onClick={() => setEditColumnModal(column)} className="ml-auto px-1 rounded text-text-tertiary hover:text-text-primary hover:bg-bg-hover">
                         <EditIcon className="h-4 w-4" />
                       </button>
                     )}
                   </div>
 
-                  {/* Cards */}
                   <div className="space-y-3">
                     {columnTasks.map((task) => (
                       <TaskCard
@@ -797,15 +622,12 @@ export default function BoardsPage() {
               );
             })}
 
-            {/* Add Column Button */}
             <div className="flex-shrink-0 w-80 space-y-4">
-              {/* Empty header matching column header structure */}
               <div className="flex items-center gap-2">
                 <div className="h-4 w-4" />
                 <div className="h-3 w-3" />
                 <span className="text-sm font-bold invisible">Placeholder</span>
               </div>
-              {/* Button matching "No tasks" placeholder */}
               <button
                 onClick={() => setAddColumnModal(true)}
                 className="w-full rounded-xl border border-dashed border-border-secondary p-6 text-center text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
@@ -817,7 +639,6 @@ export default function BoardsPage() {
         )}
       </div>
 
-      {/* Subtask Modal (Add/Edit) */}
       {subtaskModal && (
         <SubtaskModal
           task={subtaskModal.task}
@@ -827,26 +648,8 @@ export default function BoardsPage() {
           onDelete={subtaskModal.subtask ? handleDeleteSubtaskFromModal : undefined}
         />
       )}
-
-      {/* Add Column Modal */}
-      {addColumnModal && (
-        <AddColumnModal
-          onClose={() => setAddColumnModal(false)}
-          onAdd={handleAddColumn}
-        />
-      )}
-
-      {/* Edit Column Modal */}
-      {editColumnModal && (
-        <EditColumnModal
-          column={editColumnModal}
-          onClose={() => setEditColumnModal(null)}
-          onSave={handleEditColumn}
-          onDelete={handleDeleteColumn}
-        />
-      )}
-
-      {/* Task Form for editing main tasks */}
+      {addColumnModal && <AddColumnModal onClose={() => setAddColumnModal(false)} onAdd={handleAddColumn} />}
+      {editColumnModal && <EditColumnModal column={editColumnModal} onClose={() => setEditColumnModal(null)} onSave={handleEditColumn} onDelete={handleDeleteColumn} />}
       <TaskForm />
     </div>
   );
