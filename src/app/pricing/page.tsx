@@ -45,7 +45,7 @@ const PLANS_SOLO: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 10, priceLabel: null,
+    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, priceLabel: null,
     popular: false, color: 'success', inherits: null,
     features: ['1 Editor', 'Unlimited Viewers', '14 tasks per project', '5 subtasks per task', 'Full Gantt chart', 'Email support', 'PDF export'],
     cta: 'Get Started',
@@ -72,7 +72,7 @@ const PLANS_TEAM: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 10, priceLabel: 'per editor / month',
+    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, priceLabel: 'per editor / month',
     popular: false, color: 'success', inherits: null,
     features: ['Up to 3 Editors', 'Unlimited Viewers', '14 tasks per project', '5 subtasks per task', 'Full Gantt chart', 'Email support', 'PDF export'],
     cta: 'Get Started',
@@ -135,10 +135,11 @@ const COLOR_MAP: Record<PlanColor, {
 function PlanCard({ plan, annual }: { plan: Plan; annual: boolean }) {
   const c = COLOR_MAP[plan.color];
   const isAccent = plan.color === 'accent';
-  const displayPrice = annual ? plan.yearlyPrice : plan.price;
+  const displayPrice = annual ? Math.round(plan.yearlyPrice * 12) : plan.price;
+  const priceUnit = annual ? '/year + tax' : '/month + tax';
 
   return (
-    <div className={`group relative rounded-2xl bg-bg-primary p-5 transition-all ${c.cardClass}`}>
+    <div className={`group relative rounded-2xl bg-bg-primary p-8 transition-all ${c.cardClass}`}>
       {isAccent && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-text text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
           MOST POPULAR
@@ -161,7 +162,7 @@ function PlanCard({ plan, annual }: { plan: Plan; annual: boolean }) {
               <span className={`text-4xl font-bold transition-colors ${isAccent ? c.priceClass : `text-text-primary ${c.priceClass}`}`}>
                 ${displayPrice}
               </span>
-              <span className="text-text-tertiary text-sm">/mo + tax</span>
+              <span className="text-text-tertiary text-sm">{priceUnit}</span>
             </div>
             {plan.priceLabel && (
               <p className="text-xs text-text-tertiary mt-0.5">{plan.priceLabel}</p>
@@ -209,19 +210,34 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-bg-secondary">
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-16">
 
-        {/* Heading */}
-        <div className="text-center mb-10">
-          <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3">Pricing</p>
-          <h1 className="text-4xl font-bold text-text-primary">Simple, transparent pricing</h1>
-          <p className="text-text-secondary mt-3 text-base max-w-md mx-auto">
+        {/* Hero */}
+        <div className="relative text-center mb-10 py-14 rounded-3xl overflow-hidden">
+          {/* Gradient top-left → bottom-right: основний */}
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.15] via-accent/[0.05] to-transparent pointer-events-none" />
+          {/* Gradient bottom-right → top-left: контр-акцент для глибини */}
+          <div className="absolute inset-0 bg-gradient-to-tl from-accent/[0.09] to-transparent pointer-events-none" />
+
+          <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3 relative">Pricing</p>
+          <h1 className="text-4xl font-bold text-text-primary relative">Simple, transparent pricing</h1>
+          <p className="text-text-secondary mt-4 text-base max-w-md mx-auto relative">
             Start free. No credit card required. Upgrade when you&apos;re ready.
           </p>
+          <div className="flex items-center justify-center gap-6 mt-5 relative">
+            {['No credit card', 'Cancel anytime', 'Free plan forever'].map(t => (
+              <span key={t} className="flex items-center gap-1.5 text-sm text-text-tertiary">
+                <svg className="h-4 w-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Controls — Mix1 (B2 + B6) */}
-        <div className="flex flex-col items-center gap-4 mb-10">
+        {/* Controls — L3 Split */}
+        <div className="flex items-center justify-between mb-10">
           <div className="inline-flex rounded-2xl bg-bg-tertiary p-1.5 gap-1">
             <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
             <button onClick={() => setMode('team')} className={pill(mode === 'team')}>Team</button>
@@ -238,7 +254,7 @@ export default function PricingPage() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-4 gap-5">
+        <div className="grid grid-cols-4 gap-8">
           {plans.map(plan => (
             <PlanCard key={plan.id} plan={plan} annual={annual} />
           ))}
