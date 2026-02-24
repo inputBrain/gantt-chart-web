@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProjects } from '@/context/ProjectsContext';
 import { Project, ProjectColor } from '@/types/gantt';
+import { storageGet, storageRemove, STORAGE_KEYS } from '@/lib/storage';
 
 // ─── Color palette ────────────────────────────────────────────
 
@@ -37,18 +38,18 @@ interface ProjectStats {
   endDate: string | null;
 }
 
+const EMPTY_STATS: ProjectStats = {
+  taskCount: 0, completedCount: 0, subtaskCount: 0, subtasksDone: 0, startDate: null, endDate: null,
+};
+
+type RawTask = { startDate: string; endDate: string; subtasks?: Array<{ completed: boolean }> };
+
 function loadProjectStats(projectId: string): ProjectStats {
-  if (typeof window === 'undefined') {
-    return { taskCount: 0, completedCount: 0, subtaskCount: 0, subtasksDone: 0, startDate: null, endDate: null };
-  }
-  const stored = localStorage.getItem(`planify-tasks-${projectId}`);
-  // Migration: try legacy key for 'default' project
-  const raw = stored ?? (projectId === 'default' ? localStorage.getItem('gantt-tasks') : null);
-  if (!raw) {
-    return { taskCount: 0, completedCount: 0, subtaskCount: 0, subtasksDone: 0, startDate: null, endDate: null };
+  const tasks = storageGet<RawTask[]>(STORAGE_KEYS.tasks(projectId));
+  if (!tasks) {
+    return EMPTY_STATS;
   }
   try {
-    const tasks: Array<{ startDate: string; endDate: string; subtasks?: Array<{ completed: boolean }> }> = JSON.parse(raw);
     const taskCount = tasks.length;
     const completedCount = tasks.filter(t => {
       const subs = t.subtasks ?? [];
@@ -70,7 +71,7 @@ function loadProjectStats(projectId: string): ProjectStats {
       endDate:   endTimes.length > 0   ? fmt(Math.max(...endTimes))   : null,
     };
   } catch {
-    return { taskCount: 0, completedCount: 0, subtaskCount: 0, subtasksDone: 0, startDate: null, endDate: null };
+    return EMPTY_STATS;
   }
 }
 
@@ -136,8 +137,8 @@ function NewProjectModal({ onClose, onCreate }: {
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="border-b border-border-primary bg-bg-secondary px-6 py-4 flex items-center justify-between">
           <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">New Project</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
         <div className="p-6 space-y-4">
@@ -170,7 +171,7 @@ function NewProjectModal({ onClose, onCreate }: {
               <input ref={colorPickerRef} type="color" value={customColor || getColorHex(color)} onChange={e => setCustomColor(e.target.value)} className="sr-only" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 mt-22">
+          <div className="grid grid-cols-2 gap-3 mt-6">
             <button onClick={onClose} className={btnSecondary}>Cancel</button>
             <button onClick={submit} disabled={!name.trim()} className={`${btnPrimary} disabled:opacity-40`}>Create Project</button>
           </div>
@@ -203,8 +204,8 @@ function EditProjectModal({ project, onClose, onSave, onDelete }: {
         <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
           <div className="border-b border-border-primary bg-bg-secondary px-6 py-4 flex items-center justify-between">
             <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">Edit Project</h2>
-            <button type="button" onClick={onClose} className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
           <div className="p-6 space-y-4">
@@ -237,7 +238,7 @@ function EditProjectModal({ project, onClose, onSave, onDelete }: {
                 <input ref={colorPickerRef} type="color" value={customColor || getColorHex(color)} onChange={e => setCustomColor(e.target.value)} className="sr-only" />
               </div>
             </div>
-            <div className="mt-22 space-y-3">
+            <div className="mt-6 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={onClose} className={btnSecondary}>Cancel</button>
                 <button onClick={submit} disabled={!name.trim()} className={`${btnPrimary} disabled:opacity-40`}>Save Changes</button>
@@ -337,8 +338,8 @@ function ProjectCard({ project, stats, onClick, onEdit, onDragStart, onDragOver,
       {/* Edit button */}
       <button
         onClick={onEdit}
+        aria-label={`Edit project ${project.name}`}
         className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary hover:bg-bg-hover hover:text-text-primary"
-        title="Edit project"
       >
         <PencilIcon />
       </button>
@@ -444,11 +445,8 @@ export default function ProjectsPage() {
   };
 
   const handleDelete = (id: string) => {
-    // Also remove the project's tasks from localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(`planify-tasks-${id}`);
-      localStorage.removeItem(`kanban-columns-${id}`);
-    }
+    storageRemove(STORAGE_KEYS.tasks(id));
+    storageRemove(STORAGE_KEYS.kanban(id));
     deleteProject(id);
     setEditing(null);
   };

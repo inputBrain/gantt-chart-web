@@ -11,7 +11,7 @@ interface SettingsModalProps {
 const DARK_THEME_COLORS: Record<string, string> = {
   'teams-dark': '#1f1f1f',
   'teams-contrast': '#000000',
-  'dark-purpule': '#7c4dff',
+  'dark-purple': '#7c4dff',
   'dark-blue': '#3b82f6',
 };
 

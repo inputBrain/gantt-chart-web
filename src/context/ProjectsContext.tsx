@@ -3,8 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Project, ProjectColor } from '@/types/gantt';
 import { generateUUID } from '@/utils/helpers';
-
-const STORAGE_KEY = 'planify-projects';
+import { storageGet, storageSet, STORAGE_KEYS } from '@/lib/storage';
 
 const DEFAULT_PROJECT: Project = {
   id: 'default',
@@ -15,21 +14,11 @@ const DEFAULT_PROJECT: Project = {
 };
 
 function loadProjects(): Project[] {
-  if (typeof window === 'undefined') return [DEFAULT_PROJECT];
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) return [DEFAULT_PROJECT];
-  try {
-    const projects = JSON.parse(stored);
-    if (!Array.isArray(projects) || projects.length === 0) return [DEFAULT_PROJECT];
-    return projects;
-  } catch {
+  const projects = storageGet<Project[]>(STORAGE_KEYS.projects);
+  if (!projects || !Array.isArray(projects) || projects.length === 0) {
     return [DEFAULT_PROJECT];
   }
-}
-
-function saveProjects(projects: Project[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  return projects;
 }
 
 interface ProjectsContextValue {
@@ -59,47 +48,51 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
       customColor,
       createdAt: new Date().toISOString(),
     };
-    setProjects(prev => {
+    setProjects((prev) => {
       const updated = [...prev, newProject];
-      saveProjects(updated);
+      storageSet(STORAGE_KEYS.projects, updated);
       return updated;
     });
     return newProject;
   }, []);
 
   const updateProject = useCallback((id: string, name: string, description: string, color: ProjectColor, customColor?: string) => {
-    setProjects(prev => {
-      const updated = prev.map(p => p.id === id ? { ...p, name, description, color, customColor } : p);
-      saveProjects(updated);
+    setProjects((prev) => {
+      const updated = prev.map((p) =>
+        p.id === id ? { ...p, name, description, color, customColor } : p
+      );
+      storageSet(STORAGE_KEYS.projects, updated);
       return updated;
     });
   }, []);
 
   const deleteProject = useCallback((id: string) => {
-    setProjects(prev => {
-      const filtered = prev.filter(p => p.id !== id);
+    setProjects((prev) => {
+      const filtered = prev.filter((p) => p.id !== id);
       const updated = filtered.length > 0 ? filtered : [DEFAULT_PROJECT];
-      saveProjects(updated);
+      storageSet(STORAGE_KEYS.projects, updated);
       return updated;
     });
   }, []);
 
   const getProject = useCallback((id: string): Project | undefined => {
-    return projects.find(p => p.id === id);
+    return projects.find((p) => p.id === id);
   }, [projects]);
 
   const reorderProjects = useCallback((fromIndex: number, toIndex: number) => {
-    setProjects(prev => {
+    setProjects((prev) => {
       const updated = [...prev];
       const [removed] = updated.splice(fromIndex, 1);
       updated.splice(toIndex, 0, removed);
-      saveProjects(updated);
+      storageSet(STORAGE_KEYS.projects, updated);
       return updated;
     });
   }, []);
 
   return (
-    <ProjectsContext.Provider value={{ projects, addProject, updateProject, deleteProject, getProject, reorderProjects }}>
+    <ProjectsContext.Provider
+      value={{ projects, addProject, updateProject, deleteProject, getProject, reorderProjects }}
+    >
       {children}
     </ProjectsContext.Provider>
   );

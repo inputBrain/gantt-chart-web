@@ -308,8 +308,8 @@
   --task-yellow: #ffff00;
   --task-yellow-bg: #333300;
 }
-/* ===== Theme: dark purpule ===== */
-[data-theme="dark-purpule"] {
+/* ===== Theme: Dark Purple ===== */
+[data-theme="dark-purple"] {
     /* BG */
     --bg-primary: #1A223F;      /* календар, основний контент */
     --bg-secondary: #111936;    /* бокова панель, футер (root background) */

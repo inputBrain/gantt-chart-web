@@ -1,23 +1,34 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { storageGet, storageSet, STORAGE_KEYS } from '@/lib/storage';
 
-export type Theme = 'yellow' | 'blue' | 'green' | 'neutral' | 'dark-purpule' | 'dark-blue' | 'teams-dark' | 'teams-contrast';
+export type Theme =
+  | 'yellow'
+  | 'blue'
+  | 'green'
+  | 'neutral'
+  | 'dark-purple'
+  | 'dark-blue'
+  | 'teams-dark'
+  | 'teams-contrast';
 
 export const THEMES: { id: Theme; name: string; color: string }[] = [
-  { id: 'yellow', name: 'Yellow', color: '#f0b90b' },
-  { id: 'blue', name: 'Blue', color: '#2563eb' },
-  { id: 'green', name: 'Green', color: '#00c805' },
-  { id: 'neutral', name: 'Neutral', color: '#171717' },
-  { id: 'dark-purpule', name: 'Dark Purple', color: '#7c4dff' },
-  { id: 'dark-blue', name: 'Dark Blue', color: '#3b82f6' },
+  { id: 'yellow',      name: 'Yellow',      color: '#f0b90b' },
+  { id: 'blue',        name: 'Blue',        color: '#2563eb' },
+  { id: 'green',       name: 'Green',       color: '#00c805' },
+  { id: 'neutral',     name: 'Neutral',     color: '#171717' },
+  { id: 'dark-purple', name: 'Dark Purple', color: '#7c4dff' },
+  { id: 'dark-blue',   name: 'Dark Blue',   color: '#3b82f6' },
 ];
 
 // Teams-specific themes (not shown in settings, auto-applied)
 export const TEAMS_THEMES: { id: Theme; name: string }[] = [
-  { id: 'teams-dark', name: 'Teams Dark' },
+  { id: 'teams-dark',     name: 'Teams Dark' },
   { id: 'teams-contrast', name: 'Teams High Contrast' },
 ];
+
+const USER_THEMES = new Set<Theme>(THEMES.map((t) => t.id));
 
 interface ThemeContextType {
   theme: Theme;
@@ -35,8 +46,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('theme') as Theme | null;
-    if (saved && THEMES.some(t => t.id === saved)) {
+    const saved = storageGet<Theme>(STORAGE_KEYS.theme);
+    if (saved && USER_THEMES.has(saved)) {
       setThemeState(saved);
     }
   }, []);
@@ -51,9 +62,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.setAttribute('data-theme', theme);
     }
 
-    // Only save to localStorage if not a Teams theme
     if (!isTeamsTheme) {
-      localStorage.setItem('theme', theme);
+      storageSet(STORAGE_KEYS.theme, theme);
     }
   }, [theme, mounted, isTeamsTheme]);
 
@@ -63,25 +73,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   const setTeamsTheme = (teamsTheme: 'default' | 'dark' | 'contrast') => {
-    setIsTeamsTheme(true);
-
     switch (teamsTheme) {
-      case 'dark':
+      case 'dark': {
+        setIsTeamsTheme(true);
         setThemeState('teams-dark');
         break;
-      case 'contrast':
+      }
+      case 'contrast': {
+        setIsTeamsTheme(true);
         setThemeState('teams-contrast');
         break;
-      default:
-        // For Teams default/light theme, use user's saved preference
+      }
+      default: {
+        // For Teams default/light theme, restore the user's saved preference
         setIsTeamsTheme(false);
-        const saved = localStorage.getItem('theme') as Theme | null;
-        if (saved && THEMES.some(t => t.id === saved)) {
-          setThemeState(saved);
-        } else {
-          setThemeState('yellow');
-        }
+        const saved = storageGet<Theme>(STORAGE_KEYS.theme);
+        setThemeState(saved && USER_THEMES.has(saved) ? saved : 'yellow');
         break;
+      }
     }
   };
 
