@@ -35,6 +35,7 @@ export const STORAGE_KEYS = {
   theme: 'theme',
   plan: 'planify-plan',
   billingPeriod: 'planify-billing-period',
+  geoOverride: 'planify-geo-override',
   tasks: (projectId: string) => `planify-tasks-${projectId}`,
   kanban: (projectId: string) => `kanban-columns-${projectId}`,
   /** @deprecated Migrate to tasks(projectId) */

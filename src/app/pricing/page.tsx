@@ -331,17 +331,22 @@ export default function PricingPage() {
   const [mode, setMode] = useState<'solo' | 'team'>('solo');
   const [annual, setAnnual] = useState(false);
   const [currency, setCurrency] = useState<Currency>('usd');
-  const { plan: currentPlan, billingPeriod, setBillingPeriod } = usePlan();
+  const { plan: currentPlan, billingPeriod, setBillingPeriod, geoOverride } = usePlan();
   const plans = mode === 'solo' ? PLANS_SOLO : PLANS_TEAM;
 
   useEffect(() => {
+    // Use geo override from settings if set, otherwise detect via IP
+    if (geoOverride !== null) {
+      setCurrency(geoOverride === 'UA' ? 'uah' : 'usd');
+      return;
+    }
     fetch('https://ipapi.co/json/')
       .then(r => r.json())
       .then((data: { country_code?: string }) => {
         if (data.country_code === 'UA') setCurrency('uah');
       })
       .catch(() => {});
-  }, []);
+  }, [geoOverride]);
 
   // Sync the annual toggle with user's stored billing period when they arrive
   useEffect(() => {
