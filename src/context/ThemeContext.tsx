@@ -46,9 +46,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const saved = storageGet<Theme>(STORAGE_KEYS.theme);
-    if (saved && USER_THEMES.has(saved)) {
-      setThemeState(saved);
+
+    let saved = storageGet<string>(STORAGE_KEYS.theme);
+
+    // Migrate old misspelled key that was persisted before the fix
+    if (saved === 'dark-purpule') {
+      saved = 'dark-purple';
+      storageSet(STORAGE_KEYS.theme, 'dark-purple');
+    }
+
+    if (saved && USER_THEMES.has(saved as Theme)) {
+      setThemeState(saved as Theme);
     }
   }, []);
 

@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useProjects } from '@/context/ProjectsContext';
 import { Project, ProjectColor } from '@/types/gantt';
 import { storageGet, storageRemove, STORAGE_KEYS } from '@/lib/storage';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { Button } from '@/components/ui/Button';
+
+function CloseIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>;
+}
 
 // ─── Color palette ────────────────────────────────────────────
 
@@ -93,9 +99,6 @@ function UsersIcon() {
 // ─── Shared styles ────────────────────────────────────────────
 
 const inputCls = 'w-full rounded-xl border border-border-primary bg-bg-primary px-4 py-3 text-sm text-text-secondary placeholder-text-quaternary hover:border-border-secondary focus:border-accent focus:outline-none';
-const btnPrimary = 'rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover transition-colors';
-const btnSecondary = 'rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover transition-colors';
-const btnDanger = 'w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light transition-colors';
 
 // ─── Color Picker ─────────────────────────────────────────────
 
@@ -137,9 +140,7 @@ function NewProjectModal({ onClose, onCreate }: {
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="border-b border-border-primary bg-bg-secondary px-6 py-4 flex items-center justify-between">
           <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">New Project</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close" className="!p-1"><CloseIcon /></Button>
         </div>
         <div className="p-6 space-y-4">
           <div>
@@ -172,8 +173,8 @@ function NewProjectModal({ onClose, onCreate }: {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-6">
-            <button onClick={onClose} className={btnSecondary}>Cancel</button>
-            <button onClick={submit} disabled={!name.trim()} className={`${btnPrimary} disabled:opacity-40`}>Create Project</button>
+            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+            <Button variant="primary" onClick={submit} disabled={!name.trim()}>Create Project</Button>
           </div>
         </div>
       </div>
@@ -204,9 +205,7 @@ function EditProjectModal({ project, onClose, onSave, onDelete }: {
         <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl" onClick={e => e.stopPropagation()}>
           <div className="border-b border-border-primary bg-bg-secondary px-6 py-4 flex items-center justify-between">
             <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">Edit Project</h2>
-            <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+            <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close" className="!p-1"><CloseIcon /></Button>
           </div>
           <div className="p-6 space-y-4">
             <div>
@@ -240,46 +239,23 @@ function EditProjectModal({ project, onClose, onSave, onDelete }: {
             </div>
             <div className="mt-6 space-y-3">
               <div className="grid grid-cols-2 gap-3">
-                <button onClick={onClose} className={btnSecondary}>Cancel</button>
-                <button onClick={submit} disabled={!name.trim()} className={`${btnPrimary} disabled:opacity-40`}>Save Changes</button>
+                <Button variant="secondary" onClick={onClose}>Cancel</Button>
+                <Button variant="primary" onClick={submit} disabled={!name.trim()}>Save Changes</Button>
               </div>
-              <button onClick={() => setShowConfirm(true)} className={btnDanger}>Delete Project</button>
+              <Button variant="danger" fullWidth onClick={() => setShowConfirm(true)}>Delete Project</Button>
             </div>
           </div>
         </div>
       </div>
 
-      {showConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
-            <div className="p-6 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-danger/20 bg-danger-light">
-                <svg className="h-5 w-5 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-text-primary">Delete &ldquo;{project.name}&rdquo;?</h3>
-              <p className="mt-2 text-xs text-text-tertiary leading-relaxed">
-                This will permanently delete the project and all its tasks. This action cannot be undone.
-              </p>
-              <div className="mt-5 flex gap-3">
-                <button
-                  onClick={() => setShowConfirm(false)}
-                  className="flex-1 rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-hover transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => onDelete(project.id)}
-                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-accent-text hover:opacity-90 transition-opacity"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title={`Delete "${project.name}"?`}
+        message="This will permanently delete the project and all its tasks. This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => onDelete(project.id)}
+        onCancel={() => setShowConfirm(false)}
+      />
     </>
   );
 }

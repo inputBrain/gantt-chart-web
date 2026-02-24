@@ -3,25 +3,37 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { useTaskDrag } from '@/hooks/useTaskDrag';
-import { useTaskProgress } from '@/hooks/useTaskProgress';
+import { calculateTaskProgress } from '@/utils/dateUtils';
 import { Task, TimelineConfig, TASK_COLORS, getTaskColorStyles } from '@/types/gantt';
+
+/** Calculates visible progress percent accounting for clipping. Pure helper — no hooks needed. */
+function getVisibleProgressPercent(
+  progress: number,
+  position: { left: number; width: number },
+  visibleWidth: number
+): number {
+  const progressWidth = (progress / 100) * position.width;
+  const clippedLeft = Math.max(0, -position.left);
+  const visibleProgressWidth = Math.max(0, Math.min(progressWidth - clippedLeft, visibleWidth));
+  return (visibleProgressWidth / visibleWidth) * 100;
+}
 
 interface GanttTaskBarProps {
   task: Task;
   position: { left: number; width: number; top: number };
   config: TimelineConfig;
+  isSelected: boolean;
 }
 
-export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
-  const { state, updateTask, selectTask, openForm } = useGantt();
-  const progress = useTaskProgress(task);
+export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBarProps) {
+  const { updateTask, selectTask, openForm } = useGantt();
+  const progress = calculateTaskProgress(task.subtasks);
   const { isDragging, dragType, handleLeftHandleMouseDown, handleRightHandleMouseDown, handleBarMouseDown } =
     useTaskDrag({ task, config, onUpdate: updateTask });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const isSelected = state.selectedTaskId === task.id;
   const colorStyles = getTaskColorStyles(task);
   const colors = colorStyles.classes;
 
@@ -106,25 +118,16 @@ export function GanttTaskBar({ task, position, config }: GanttTaskBarProps) {
       )}
 
       {/* Progress bar - adjusted for visible portion */}
-      {(() => {
-        // Calculate progress bar width relative to visible area
-        const totalWidth = position.width;
-        const progressWidth = (progress / 100) * totalWidth;
-        const clippedLeft = Math.max(0, -position.left);
-        const visibleProgressWidth = Math.max(0, Math.min(progressWidth - clippedLeft, visibleWidth));
-        const progressPercent = (visibleProgressWidth / visibleWidth) * 100;
-
-        return progressPercent > 0 ? (
-          <div
-            className={`absolute left-0 top-0 h-full ${colors.progress} ${!isClippedLeft ? 'rounded-l-md' : ''}`}
-            style={{
-              width: `${progressPercent}%`,
-              opacity: 0.35,
-              ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor })
-            }}
-          />
-        ) : null;
-      })()}
+      {getVisibleProgressPercent(progress, position, visibleWidth) > 0 && (
+        <div
+          className={`absolute left-0 top-0 h-full ${colors.progress} ${!isClippedLeft ? 'rounded-l-md' : ''}`}
+          style={{
+            width: `${getVisibleProgressPercent(progress, position, visibleWidth)}%`,
+            opacity: 0.35,
+            ...(colorStyles.progressColor && { backgroundColor: colorStyles.progressColor }),
+          }}
+        />
+      )}
 
       {/* Task name */}
       <div

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task, getTaskColorStyles } from '@/types/gantt';
 import { formatDateShort, calculateTaskProgress } from '@/utils/dateUtils';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { Button } from '@/components/ui/Button';
 
 // Icons
 function ChevronIcon({ className, expanded }: { className?: string; expanded?: boolean }) {
@@ -96,15 +98,12 @@ export function GanttTaskList() {
             </span>
           )}
         </div>
-        <button
-          onClick={() => openForm()}
-          className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-text hover:bg-accent-hover"
-        >
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <Button variant="primary" size="sm" onClick={() => openForm()} className="flex items-center gap-1.5">
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           New
-        </button>
+        </Button>
       </div>
 
       {/* Task List */}
@@ -284,41 +283,23 @@ export function GanttTaskList() {
         )}
       </div>
 
-      {/* Delete confirmation modal */}
-      {taskToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
-            <div className="p-6 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-light">
-                <TrashIcon className="h-6 w-6 text-danger" />
-              </div>
-              <h3 className="mb-1 text-base font-bold text-text-primary">Delete Task</h3>
-              <p className="mb-6 text-sm text-text-tertiary">
-                Are you sure you want to delete <span className="font-semibold text-text-secondary">{taskToDelete.name}</span>? This action cannot be undone.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setTaskToDelete(null)}
-                  className="flex-1 rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-hover"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    deleteTask(taskToDelete.id);
-                    setTaskToDelete(null);
-                  }}
-                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-accent-text hover:opacity-90"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={taskToDelete !== null}
+        title="Delete Task"
+        message={
+          <>
+            Are you sure you want to delete{' '}
+            <span className="font-semibold text-text-secondary">{taskToDelete?.name}</span>?
+            This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (taskToDelete) deleteTask(taskToDelete.id);
+          setTaskToDelete(null);
+        }}
+        onCancel={() => setTaskToDelete(null)}
+      />
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { useGantt } from '@/context/GanttContext';
 import { TaskColor, TASK_COLORS, Task } from '@/types/gantt';
 import { formatDate, parseDate } from '@/utils/dateUtils';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { Button } from '@/components/ui/Button';
 
 const COLORS: TaskColor[] = ['blue', 'green', 'purple', 'orange', 'red', 'teal', 'pink', 'yellow'];
 
@@ -103,40 +105,20 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      {/* Delete confirmation modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
-            <div className="p-6 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-light">
-                <svg className="h-6 w-6 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </div>
-              <h3 className="mb-1 text-base font-bold text-text-primary">Delete Task</h3>
-              <p className="mb-6 text-sm text-text-tertiary">
-                Are you sure you want to delete <span className="font-semibold text-text-secondary">{editingTask?.name}</span>? This action cannot be undone.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 rounded-xl border border-border-primary bg-bg-primary px-4 py-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-hover"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmDelete}
-                  className="flex-1 rounded-xl bg-danger px-4 py-2.5 text-xs font-semibold text-accent-text hover:opacity-90"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Task"
+        message={
+          <>
+            Are you sure you want to delete{' '}
+            <span className="font-semibold text-text-secondary">{editingTask?.name}</span>?
+            This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
 
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border-primary bg-bg-tertiary shadow-2xl">
         {/* Header */}
@@ -145,14 +127,17 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
             <h2 className="text-base font-bold text-text-primary uppercase tracking-wider">
               {editingTask ? 'Edit Task' : 'New Task'}
             </h2>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={closeForm}
-              className="rounded-lg p-1 text-text-quaternary hover:bg-bg-hover hover:text-text-secondary"
+              aria-label="Close"
+              className="!p-1"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -333,28 +318,17 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
           {/* Actions */}
           <div className="mt-6 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={closeForm}
-                className="rounded-xl border border-border-secondary bg-transparent px-4 py-2.5 text-xs font-semibold text-text-secondary hover:border-text-tertiary hover:bg-bg-hover"
-              >
+              <Button variant="secondary" onClick={closeForm}>
                 Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-text hover:bg-accent-hover"
-              >
+              </Button>
+              <Button type="submit" variant="primary">
                 {editingTask ? 'Save Changes' : 'Create Task'}
-              </button>
+              </Button>
             </div>
             {editingTask && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="w-full rounded-xl border border-danger bg-transparent px-4 py-2.5 text-xs font-semibold text-danger hover:bg-danger-light"
-              >
+              <Button variant="danger" fullWidth onClick={handleDelete}>
                 Delete Task
-              </button>
+              </Button>
             )}
           </div>
         </form>

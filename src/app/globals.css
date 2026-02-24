@@ -105,6 +105,23 @@
   --today: #2563eb;
   --today-bg: #eff6ff;
   --today-text: #2563eb;
+
+  --task-blue: #1e88e5;
+  --task-blue-bg: #dbeafe;
+  --task-green: #16a34a;
+  --task-green-bg: #dcfce7;
+  --task-purple: #7c3aed;
+  --task-purple-bg: #ede9fe;
+  --task-orange: #f59e0b;
+  --task-orange-bg: #fef3c7;
+  --task-red: #dc2626;
+  --task-red-bg: #fee2e2;
+  --task-teal: #0d9488;
+  --task-teal-bg: #ccfbf1;
+  --task-pink: #db2777;
+  --task-pink-bg: #fce7f3;
+  --task-yellow: #ca8a04;
+  --task-yellow-bg: #fef9c3;
 }
 
 /* ===== Theme: Crypto Green (Robinhood) ===== */
@@ -147,6 +164,23 @@
   --today: #00c805;
   --today-bg: #ecfdf5;
   --today-text: #00c805;
+
+  --task-blue: #1e88e5;
+  --task-blue-bg: #e3f2fd;
+  --task-green: #00c805;
+  --task-green-bg: #dcfce7;
+  --task-purple: #7c3aed;
+  --task-purple-bg: #ede9fe;
+  --task-orange: #f59e0b;
+  --task-orange-bg: #fef3c7;
+  --task-red: #ff5000;
+  --task-red-bg: #fff7ed;
+  --task-teal: #0d9488;
+  --task-teal-bg: #ccfbf1;
+  --task-pink: #db2777;
+  --task-pink-bg: #fce7f3;
+  --task-yellow: #ca8a04;
+  --task-yellow-bg: #fef9c3;
 }
 
 /* ===== Theme: Neutral (Minimal) ===== */
@@ -189,6 +223,23 @@
   --today: #171717;
   --today-bg: #f5f5f5;
   --today-text: #171717;
+
+  --task-blue: #3b82f6;
+  --task-blue-bg: #eff6ff;
+  --task-green: #22c55e;
+  --task-green-bg: #f0fdf4;
+  --task-purple: #8b5cf6;
+  --task-purple-bg: #f5f3ff;
+  --task-orange: #f97316;
+  --task-orange-bg: #fff7ed;
+  --task-red: #ef4444;
+  --task-red-bg: #fef2f2;
+  --task-teal: #14b8a6;
+  --task-teal-bg: #f0fdfa;
+  --task-pink: #ec4899;
+  --task-pink-bg: #fdf2f8;
+  --task-yellow: #eab308;
+  --task-yellow-bg: #fefce8;
 }
 
 /* ===== Theme: Teams Dark ===== */

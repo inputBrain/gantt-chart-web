@@ -218,7 +218,13 @@ export function GanttTimeline() {
 
           {/* Task bars */}
           {taskPositions.map(({ task, position }) => (
-            <GanttTaskBar key={task.id} task={task} position={position} config={config} />
+            <GanttTaskBar
+              key={task.id}
+              task={task}
+              position={position}
+              config={config}
+              isSelected={state.selectedTaskId === task.id}
+            />
           ))}
         </div>
       </div>
