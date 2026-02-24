@@ -15,11 +15,11 @@ export type Theme =
 
 export const THEMES: { id: Theme; name: string; color: string }[] = [
   { id: 'yellow',      name: 'Yellow',      color: '#f0b90b' },
-  { id: 'blue',        name: 'Blue',        color: '#2563eb' },
+  { id: 'blue',        name: 'Blue',        color: '#3b82f6' },
   { id: 'green',       name: 'Green',       color: '#00c805' },
   { id: 'neutral',     name: 'Neutral',     color: '#171717' },
-  { id: 'dark-purple', name: 'Dark Purple', color: '#7c4dff' },
-  { id: 'dark-blue',   name: 'Dark Blue',   color: '#3b82f6' },
+  { id: 'dark-purple', name: 'Dark Blue', color: '#1362E7' },
+  { id: 'dark-blue',   name: 'Deep Blue',   color: '#093073' },
 ];
 
 // Teams-specific themes (not shown in settings, auto-applied)

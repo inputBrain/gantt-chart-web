@@ -84,7 +84,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }`}
               >
                 <div className="h-8 w-8 rounded-full" style={{ backgroundColor: t.color }} />
-                <span className="text-xs font-medium text-text-secondary">{t.name.replace('Dark ', '')}</span>
+                <span className="text-xs font-medium text-text-secondary">{t.name}</span>
               </button>
             ))}
             {TEAMS_THEMES.map((t) => (
