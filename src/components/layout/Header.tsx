@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { SettingsModal } from './SettingsModal';
 
 function Logo() {
@@ -59,21 +59,26 @@ export function Header() {
         <nav className="flex items-center gap-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
+            const hasSeparator = navItems.length > 2 && (item.label === 'Gantt' || item.label === 'Pricing');
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative px-4 py-4 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'text-accent'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                {item.label}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+              <Fragment key={item.href}>
+                {hasSeparator && (
+                  <span className="mx-2 h-4 w-px bg-border-secondary" aria-hidden="true" />
                 )}
-              </Link>
+                <Link
+                  href={item.href}
+                  className={`relative px-4 py-4 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-accent'
+                      : 'text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {item.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+                  )}
+                </Link>
+              </Fragment>
             );
           })}
         </nav>
