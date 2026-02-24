@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePlan, BillingPeriod } from '@/context/PlanContext';
+import { getPlanStatus, PlanStatus } from '@/lib/plans';
 
-// ─── Icons ────────────────────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────
 
 function CheckIcon({ className }: { className?: string }) {
   return (
@@ -20,7 +22,7 @@ function CrownIcon({ className }: { className?: string }) {
   );
 }
 
-// ─── Plan data ────────────────────────────────────────────────
+// ─── Plan data ────────────────────────────────────────────
 
 type PlanColor = 'neutral' | 'success' | 'accent' | 'purple';
 type Currency = 'usd' | 'uah';
@@ -146,10 +148,11 @@ const PLANS_TEAM: Plan[] = [
   },
 ];
 
-// ─── Color map ────────────────────────────────────────────────
+// ─── Color map ────────────────────────────────────────────
 
 const COLOR_MAP: Record<PlanColor, {
   cardClass: string;
+  currentCardClass: string;
   priceClass: string;
   checkBgClass: string;
   checkIconClass: string;
@@ -157,6 +160,7 @@ const COLOR_MAP: Record<PlanColor, {
 }> = {
   neutral: {
     cardClass: 'border border-border-primary hover:border-border-secondary hover:shadow-lg',
+    currentCardClass: 'border-2 border-border-secondary shadow-lg',
     priceClass: '',
     checkBgClass: 'bg-bg-tertiary',
     checkIconClass: 'text-text-tertiary',
@@ -164,6 +168,7 @@ const COLOR_MAP: Record<PlanColor, {
   },
   success: {
     cardClass: 'border border-border-primary hover:border-success hover:shadow-xl hover:shadow-success/10',
+    currentCardClass: 'border-2 border-success shadow-lg shadow-success/10',
     priceClass: 'group-hover:text-success',
     checkBgClass: 'bg-bg-tertiary group-hover:bg-success-light',
     checkIconClass: 'text-text-tertiary group-hover:text-success',
@@ -171,6 +176,7 @@ const COLOR_MAP: Record<PlanColor, {
   },
   accent: {
     cardClass: 'border-2 border-accent shadow-lg shadow-accent/10 hover:shadow-xl hover:shadow-accent/20',
+    currentCardClass: 'border-2 border-accent shadow-lg shadow-accent/20',
     priceClass: 'text-accent',
     checkBgClass: 'bg-accent-light',
     checkIconClass: 'text-accent',
@@ -178,6 +184,7 @@ const COLOR_MAP: Record<PlanColor, {
   },
   purple: {
     cardClass: 'border border-border-primary hover:border-purple-500 hover:shadow-xl hover:shadow-purple-500/10',
+    currentCardClass: 'border-2 border-purple-500 shadow-lg shadow-purple-500/10',
     priceClass: 'group-hover:text-purple-500',
     checkBgClass: 'bg-bg-tertiary group-hover:bg-purple-100',
     checkIconClass: 'text-text-tertiary group-hover:text-purple-500',
@@ -185,12 +192,44 @@ const COLOR_MAP: Record<PlanColor, {
   },
 };
 
-// ─── Plan card ────────────────────────────────────────────────
+// ─── Current-plan badge colors (match plan theme) ──────────
 
-function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; currency: Currency }) {
+const CURRENT_BADGE_CLASS: Record<PlanColor, string> = {
+  neutral: 'bg-border-secondary text-text-primary',
+  success: 'bg-success text-white',
+  accent:  'bg-accent text-accent-text',
+  purple:  'bg-purple-500 text-white',
+};
+
+const CURRENT_INDICATOR_CLASS: Record<PlanColor, string> = {
+  neutral: 'border-border-secondary/40 bg-border-secondary/10 text-text-secondary',
+  success: 'border-success/30 bg-success/10 text-success',
+  accent:  'border-accent/30 bg-accent/10 text-accent',
+  purple:  'border-purple-500/30 bg-purple-500/10 text-purple-600',
+};
+
+// ─── Plan card ────────────────────────────────────────────
+
+function PlanCard({ plan, annual, currency, status, userBillingPeriod, onSwitchBilling, showMostPopular }: {
+  plan: Plan;
+  annual: boolean;
+  currency: Currency;
+  status: PlanStatus;
+  userBillingPeriod: BillingPeriod;
+  onSwitchBilling: (period: BillingPeriod) => void;
+  showMostPopular: boolean;
+}) {
   const c = COLOR_MAP[plan.color];
   const isAccent = plan.color === 'accent';
   const isUah = currency === 'uah';
+
+  // Billing period the user is currently viewing
+  const viewingPeriod: BillingPeriod = annual ? 'annual' : 'monthly';
+  // True only when tier AND billing period both match what user has
+  const isCurrent = status === 'current' && userBillingPeriod === viewingPeriod;
+  // Same tier, different billing period (e.g. user has monthly Pro, viewing annual tab)
+  const isSameTierDifferentBilling = status === 'current' && !isCurrent;
+  const isDowngrade = status === 'downgrade';
 
   const rawMonthly = isUah ? plan.uahPrice : plan.price;
   const rawYearly  = isUah ? plan.uahYearlyPrice : plan.yearlyPrice;
@@ -198,13 +237,25 @@ function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; cur
   const symbol = isUah ? '₴' : '$';
   const priceUnit = annual ? '/year + tax' : '/month + tax';
 
+  const cardBorder = isCurrent
+    ? c.currentCardClass
+    : isDowngrade
+    ? 'border border-border-primary opacity-60'
+    : c.cardClass;
+
   return (
-    <div className={`group relative rounded-2xl bg-bg-primary p-8 transition-all ${c.cardClass}`}>
-      {isAccent && (
+    <div className={`group relative rounded-2xl bg-bg-primary p-8 transition-all ${cardBorder}`}>
+      {/* Top badge */}
+      {isCurrent ? (
+        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap flex items-center gap-1.5 ${CURRENT_BADGE_CLASS[plan.color]}`}>
+          <CheckIcon className="h-3 w-3" />
+          CURRENT PLAN
+        </div>
+      ) : isAccent && showMostPopular ? (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-text text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
           MOST POPULAR
         </div>
-      )}
+      ) : null}
 
       {/* Name */}
       <div className="flex items-center gap-1.5">
@@ -219,7 +270,7 @@ function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; cur
         ) : (
           <>
             <div className="flex items-baseline gap-1">
-              <span className={`text-4xl font-bold transition-colors ${isAccent ? c.priceClass : `text-text-primary ${c.priceClass}`}`}>
+              <span className={`text-4xl font-bold transition-colors ${isAccent && !isCurrent ? c.priceClass : `text-text-primary ${isCurrent ? '' : c.priceClass}`}`}>
                 {symbol}{displayPrice}
               </span>
               <span className="text-text-tertiary text-sm">{priceUnit}</span>
@@ -232,9 +283,25 @@ function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; cur
       </div>
 
       {/* CTA */}
-      <button className={`mt-5 w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${c.btnClass}`}>
-        {plan.cta}
-      </button>
+      {isCurrent ? (
+        <div className={`mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 text-sm font-semibold select-none cursor-default ${CURRENT_INDICATOR_CLASS[plan.color]}`}>
+          <CheckIcon className="h-4 w-4" />
+          Your current plan
+        </div>
+      ) : isSameTierDifferentBilling ? (
+        <button
+          onClick={() => onSwitchBilling(viewingPeriod)}
+          className={`mt-5 w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${c.btnClass}`}
+        >
+          {annual ? 'Switch to Annual (−20%)' : 'Switch to Monthly'}
+        </button>
+      ) : isDowngrade ? (
+        <div className="mt-5 h-[42px]" aria-hidden="true" />
+      ) : (
+        <button className={`mt-5 w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${c.btnClass}`}>
+          {plan.cta}
+        </button>
+      )}
 
       {/* Features */}
       <div className="mt-5">
@@ -258,12 +325,13 @@ function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; cur
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────
+// ─── Page ────────────────────────────────────────────────
 
 export default function PricingPage() {
   const [mode, setMode] = useState<'solo' | 'team'>('solo');
   const [annual, setAnnual] = useState(false);
   const [currency, setCurrency] = useState<Currency>('usd');
+  const { plan: currentPlan, billingPeriod, setBillingPeriod } = usePlan();
   const plans = mode === 'solo' ? PLANS_SOLO : PLANS_TEAM;
 
   useEffect(() => {
@@ -274,6 +342,13 @@ export default function PricingPage() {
       })
       .catch(() => {});
   }, []);
+
+  // Sync the annual toggle with user's stored billing period when they arrive
+  useEffect(() => {
+    setAnnual(billingPeriod === 'annual');
+  }, [billingPeriod]);
+
+  const showMostPopular = currentPlan === 'free';
 
   const pill = (active: boolean) =>
     `px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-accent text-accent-text shadow-sm' : 'text-text-tertiary hover:text-text-secondary'}`;
@@ -330,7 +405,16 @@ export default function PricingPage() {
         {/* Cards */}
         <div className="grid grid-cols-4 gap-8">
           {plans.map(plan => (
-            <PlanCard key={plan.id} plan={plan} annual={annual} currency={currency} />
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              annual={annual}
+              currency={currency}
+              status={getPlanStatus(plan.id, currentPlan)}
+              userBillingPeriod={billingPeriod}
+              onSwitchBilling={setBillingPeriod}
+              showMostPopular={showMostPopular}
+            />
           ))}
         </div>
 

@@ -22,6 +22,25 @@ export const PLAN_NAMES: Record<PlanTier, string> = {
 
 export const ALL_PLAN_TIERS: PlanTier[] = ['free', 'starter', 'pro', 'business', 'team', 'enterprise'];
 
+/** Numeric rank for upgrade/downgrade comparisons (higher = more powerful).
+ *  Team tiers intentionally rank above solo tiers of the same tier level. */
+export const PLAN_RANK: Record<PlanTier, number> = {
+  free: 0,
+  starter: 1,
+  pro: 2,
+  business: 3,
+  team: 4,
+  enterprise: 5,
+};
+
+export type PlanStatus = 'current' | 'upgrade' | 'downgrade';
+
+export function getPlanStatus(planId: string, currentPlan: PlanTier): PlanStatus {
+  if (planId === currentPlan) return 'current';
+  const planRank = PLAN_RANK[planId as PlanTier] ?? 0;
+  return planRank > PLAN_RANK[currentPlan] ? 'upgrade' : 'downgrade';
+}
+
 /** Returns true when a value is within the limit (null = unlimited). */
 export function withinLimit(current: number, max: number | null): boolean {
   return max === null || current < max;
