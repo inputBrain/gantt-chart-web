@@ -271,9 +271,10 @@ function EditProjectModal({ project, onClose, onSave, onDelete }: {
 
 // ─── Project Card ─────────────────────────────────────────────
 
-function ProjectCard({ project, stats, onClick, onEdit, onDragStart, onDragOver, onDrop, onDragEnd, isDragging, isDragOver }: {
+function ProjectCard({ project, stats, isLocked, onClick, onEdit, onDragStart, onDragOver, onDrop, onDragEnd, isDragging, isDragOver }: {
   project: Project;
   stats: ProjectStats;
+  isLocked: boolean;
   onClick: () => void;
   onEdit: (e: React.MouseEvent) => void;
   onDragStart: (e: React.DragEvent) => void;
@@ -313,12 +314,21 @@ function ProjectCard({ project, stats, onClick, onEdit, onDragStart, onDragOver,
       onDragEnd={() => { onDragEnd(); }}
       onClick={handleClick}
       className={`group relative flex flex-col bg-bg-primary border rounded-2xl p-6 cursor-grab active:cursor-grabbing transition-all
+        ${isLocked ? 'border-warning/40 opacity-75' : ''}
         ${isDragging ? 'opacity-40 scale-[0.97] border-border-primary shadow-none' : ''}
         ${isDragOver && !isDragging ? 'border-accent shadow-lg shadow-accent/10 scale-[1.01]' : ''}
-        ${!isDragging && !isDragOver ? 'border-border-primary hover:border-border-secondary hover:shadow-lg' : ''}`}
+        ${!isLocked && !isDragging && !isDragOver ? 'border-border-primary hover:border-border-secondary hover:shadow-lg' : ''}`}
     >
       {/* Color stripe */}
-      <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl ${colorBg}`} style={customBgStyle} />
+      <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl ${isLocked ? 'bg-warning/40' : colorBg}`} style={isLocked ? undefined : customBgStyle} />
+
+      {/* Lock badge for over-limit projects */}
+      {isLocked && (
+        <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
+          <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+          Read-only
+        </div>
+      )}
 
       {/* Edit button */}
       <button
@@ -526,11 +536,14 @@ export default function ProjectsPage() {
 
         {/* Grid */}
         <div className="grid grid-cols-3 gap-5">
-          {projects.map((project, index) => (
+          {projects.map((project, index) => {
+            const isProjectLocked = limits.maxProjects !== null && index >= limits.maxProjects;
+            return (
             <ProjectCard
               key={project.id}
               project={project}
               stats={statsMap[project.id] ?? { taskCount: 0, completedCount: 0, subtaskCount: 0, subtasksDone: 0, startDate: null, endDate: null }}
+              isLocked={isProjectLocked}
               onClick={() => router.push(`/projects/${project.id}`)}
               onEdit={e => { e.stopPropagation(); setEditing(project); }}
               onDragStart={e => handleDragStart(index, e)}
@@ -540,7 +553,8 @@ export default function ProjectsPage() {
               isDragging={draggedIndex === index}
               isDragOver={dragOverIndex === index}
             />
-          ))}
+            );
+          })}
           {projectLimitReached ? (
             <Link
               href="/pricing"

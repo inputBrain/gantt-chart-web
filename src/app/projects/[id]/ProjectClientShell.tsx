@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { GanttProvider } from '@/context/GanttContext';
 import { useProjects } from '@/context/ProjectsContext';
+import { usePlan } from '@/context/PlanContext';
 
 const PROJECT_COLOR_BG: Record<string, string> = {
   blue:   'bg-blue-500',
@@ -89,8 +90,22 @@ export function ProjectClientShell({
   projectId: string;
   children: React.ReactNode;
 }) {
+  const { projects } = useProjects();
+  const { limits } = usePlan();
+
+  // Project is read-only when its position in the list exceeds the plan's project limit.
+  const projectIndex = projects.findIndex(p => p.id === projectId);
+  const isProjectLocked =
+    projectIndex !== -1 &&
+    limits.maxProjects !== null &&
+    projectIndex >= limits.maxProjects;
+
   return (
-    <GanttProvider projectId={projectId}>
+    <GanttProvider
+      projectId={projectId}
+      isReadOnly={isProjectLocked}
+      maxTasksPerProject={isProjectLocked ? null : limits.maxTasksPerProject}
+    >
       <ProjectSubHeader projectId={projectId} />
       {children}
     </GanttProvider>

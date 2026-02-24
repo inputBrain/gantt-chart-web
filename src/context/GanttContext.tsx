@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef, useMemo } from 'react';
 import { GanttState, GanttAction, Task, ViewMode, Subtask } from '@/types/gantt';
 import { addMonths } from '@/utils/dateUtils';
 import { generateUUID } from '@/utils/helpers';
@@ -188,6 +188,10 @@ const initialState: GanttState = {
  */
 interface GanttContextValue {
   state: GanttState;
+  /** True when this project exceeds the user's plan project limit — all writes are blocked. */
+  isReadOnly: boolean;
+  /** Set of task IDs that exceed the per-project task limit — edit blocked, delete allowed. */
+  lockedTaskIds: Set<string>;
   addTask: (task: Omit<Task, 'id'>) => void;
   updateTask: (task: Task) => void;
   deleteTask: (id: string) => void;
@@ -210,9 +214,15 @@ const GanttContext = createContext<GanttContextValue | null>(null);
 export function GanttProvider({
   children,
   projectId,
+  isReadOnly = false,
+  maxTasksPerProject = null,
 }: {
   children: React.ReactNode;
   projectId: string;
+  /** Project is locked — exceeds plan's project limit. */
+  isReadOnly?: boolean;
+  /** Per-project task limit from the current plan. Tasks beyond this index are edit-locked. */
+  maxTasksPerProject?: number | null;
 }) {
   const [state, dispatch] = useReducer(ganttReducer, initialState);
 
@@ -286,8 +296,16 @@ export function GanttProvider({
     []
   );
 
+  // Tasks at index >= maxTasksPerProject are "over-limit locked": delete allowed, edit blocked.
+  const lockedTaskIds = useMemo<Set<string>>(() => {
+    if (isReadOnly || maxTasksPerProject === null) return new Set();
+    return new Set(state.tasks.slice(maxTasksPerProject).map(t => t.id));
+  }, [state.tasks, isReadOnly, maxTasksPerProject]);
+
   const value: GanttContextValue = {
     state,
+    isReadOnly,
+    lockedTaskIds,
     addTask,
     updateTask,
     deleteTask,

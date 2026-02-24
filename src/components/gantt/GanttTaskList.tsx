@@ -11,6 +11,14 @@ import { usePlan } from '@/context/PlanContext';
 import { withinLimit } from '@/lib/plans';
 
 // Icons
+function LockIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+    </svg>
+  );
+}
+
 function ChevronIcon({ className, expanded }: { className?: string; expanded?: boolean }) {
   return (
     <svg className={`${className} transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -68,7 +76,7 @@ function DocumentIcon({ className }: { className?: string }) {
 }
 
 export function GanttTaskList() {
-  const { state, selectTask, openForm, deleteTask } = useGantt();
+  const { state, selectTask, openForm, deleteTask, isReadOnly, lockedTaskIds } = useGantt();
   const { limits } = usePlan();
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
@@ -104,7 +112,7 @@ export function GanttTaskList() {
             </span>
           )}
         </div>
-        {taskLimitReached ? (
+        {taskLimitReached || isReadOnly ? (
           <Link
             href="/pricing"
             className="flex items-center gap-1.5 rounded-lg border border-warning/40 bg-warning/10 px-4 py-1.5 text-xs font-semibold text-warning hover:bg-warning/20 transition-colors"
@@ -123,6 +131,15 @@ export function GanttTaskList() {
           </Button>
         )}
       </div>
+
+      {/* Read-only banner */}
+      {isReadOnly && (
+        <div className="mx-3 mt-3 flex items-center gap-2 rounded-xl border border-warning/40 bg-warning/10 px-3 py-2.5 text-xs text-warning">
+          <LockIcon className="h-3.5 w-3.5 flex-shrink-0" />
+          <span className="flex-1">Project over plan limit — read-only.</span>
+          <Link href="/pricing" className="font-semibold underline hover:no-underline whitespace-nowrap">Upgrade →</Link>
+        </div>
+      )}
 
       {/* Task List */}
       <div className="flex-1 overflow-auto">
@@ -149,7 +166,9 @@ export function GanttTaskList() {
               const subtasks = task.subtasks || [];
               const completedSubs = subtasks.filter((s) => s.completed).length;
 
-              return (
+              const isTaskLocked = isReadOnly || lockedTaskIds.has(task.id);
+
+            return (
                 <div
                   key={task.id}
                   className={`border-b border-border-primary transition-colors ${isExpanded ? 'bg-card-expanded-bg' : ''}`}
@@ -169,8 +188,9 @@ export function GanttTaskList() {
                     />
 
                     {/* Task name */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex items-center gap-1.5">
                       <div className="text-sm font-medium text-text-primary truncate">{task.name}</div>
+                      {isTaskLocked && <LockIcon className="h-3 w-3 text-warning/60 flex-shrink-0" />}
                     </div>
 
                     {/* Progress and chevron */}
@@ -281,16 +301,27 @@ export function GanttTaskList() {
                           <TrashIcon className="h-3.5 w-3.5" />
                           Delete
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openForm(task);
-                          }}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-warning bg-warning-light hover:bg-warning/20 rounded-lg transition-colors"
-                        >
-                          <EditIcon className="h-3.5 w-3.5" />
-                          Edit
-                        </button>
+                        {isTaskLocked ? (
+                          <Link
+                            href="/pricing"
+                            onClick={e => e.stopPropagation()}
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-warning bg-warning/10 hover:bg-warning/20 rounded-lg transition-colors border border-warning/30"
+                          >
+                            <LockIcon className="h-3.5 w-3.5" />
+                            Upgrade
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openForm(task);
+                            }}
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-warning bg-warning-light hover:bg-warning/20 rounded-lg transition-colors"
+                          >
+                            <EditIcon className="h-3.5 w-3.5" />
+                            Edit
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}

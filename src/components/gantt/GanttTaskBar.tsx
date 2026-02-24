@@ -26,10 +26,12 @@ interface GanttTaskBarProps {
 }
 
 export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBarProps) {
-  const { updateTask, selectTask, openForm } = useGantt();
+  const { updateTask, selectTask, openForm, isReadOnly, lockedTaskIds } = useGantt();
+  const isTaskLocked = isReadOnly || lockedTaskIds.has(task.id);
   const progress = calculateTaskProgress(task.subtasks);
+  // Drag is a no-op for locked tasks/projects — pass a stub updater so no state changes occur.
   const { isDragging, dragType, handleLeftHandleMouseDown, handleRightHandleMouseDown, handleBarMouseDown } =
-    useTaskDrag({ task, config, onUpdate: updateTask });
+    useTaskDrag({ task, config, onUpdate: isTaskLocked ? () => {} : updateTask });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -70,7 +72,7 @@ export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBa
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    openForm(task);
+    if (!isTaskLocked) openForm(task);
   };
 
   // Calculate visible portion of the task bar
@@ -105,8 +107,8 @@ export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBa
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      {/* Left resize handle - only show if not clipped on left and not blocked */}
-      {!isClippedLeft && !task.blocked && (
+      {/* Left resize handle - only show if not clipped on left, not blocked, and not locked */}
+      {!isClippedLeft && !task.blocked && !isTaskLocked && (
         <div
           className={`absolute -left-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
             isDragging && dragType === 'left' ? 'opacity-100' : ''
@@ -132,7 +134,7 @@ export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBa
       {/* Task name */}
       <div
         className="relative z-10 flex-1 truncate px-2.5 text-xs font-semibold text-text-primary"
-        onMouseDown={task.blocked ? undefined : handleBarMouseDown}
+        onMouseDown={task.blocked || isTaskLocked ? undefined : handleBarMouseDown}
       >
         {task.name}
       </div>
@@ -213,8 +215,8 @@ export function GanttTaskBar({ task, position, config, isSelected }: GanttTaskBa
         )}
       </div>
 
-      {/* Right resize handle - only show if not clipped on right and not blocked */}
-      {!isClippedRight && !task.blocked && (
+      {/* Right resize handle - only show if not clipped on right, not blocked, and not locked */}
+      {!isClippedRight && !task.blocked && !isTaskLocked && (
         <div
           className={`absolute -right-1 top-0 h-full w-2.5 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100 ${
             isDragging && dragType === 'right' ? 'opacity-100' : ''

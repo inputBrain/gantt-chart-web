@@ -114,6 +114,7 @@ interface SubtaskItemProps {
   index: number;
   colorClass: string;
   colorStyle?: string;
+  isLocked: boolean;
   onToggle: (e: React.MouseEvent) => void;
   onClick: () => void;
   onDelete: (e: React.MouseEvent) => void;
@@ -128,6 +129,7 @@ function SubtaskItem({
   index,
   colorClass,
   colorStyle,
+  isLocked,
   onToggle,
   onClick,
   onDelete,
@@ -138,14 +140,14 @@ function SubtaskItem({
 }: SubtaskItemProps) {
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, index)}
+      draggable={!isLocked}
+      onDragStart={(e) => !isLocked && onDragStart(e, index)}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, index)}
-      className={`group flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-all ${
-        isDragging ? 'opacity-50 bg-bg-tertiary' : 'hover:bg-bg-hover'
+      className={`group flex items-start gap-2 p-2 rounded-lg transition-all ${
+        isLocked ? 'opacity-70 cursor-default' : isDragging ? 'opacity-50 bg-bg-tertiary cursor-pointer' : 'hover:bg-bg-hover cursor-pointer'
       }`}
-      onClick={onClick}
+      onClick={isLocked ? undefined : onClick}
     >
       <div className="mt-1 cursor-grab active:cursor-grabbing text-text-quaternary opacity-0 group-hover:opacity-100 transition-opacity">
         <DragIcon className="h-4 w-4" />
@@ -172,13 +174,25 @@ function SubtaskItem({
           </div>
         )}
       </div>
-      <button
-        onClick={onDelete}
-        className="p-1 rounded text-text-quaternary opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-danger-light transition-all"
-        title="Delete"
-      >
-        <TrashIcon className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {isLocked && (
+          <Link
+            href="/pricing"
+            onClick={e => e.stopPropagation()}
+            title="Upgrade to edit"
+            className="p-1 rounded text-warning opacity-60 hover:opacity-100 transition-opacity"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+          </Link>
+        )}
+        <button
+          onClick={onDelete}
+          className="p-1 rounded text-text-quaternary opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-danger-light transition-all"
+          title="Delete"
+        >
+          <TrashIcon className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -186,6 +200,7 @@ function SubtaskItem({
 interface TaskCardProps {
   task: Task;
   maxSubtasksPerTask: number | null;
+  isTaskLocked: boolean;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onAddSubtask: (task: Task) => void;
   onEditTask: (task: Task) => void;
@@ -197,6 +212,7 @@ interface TaskCardProps {
 function TaskCard({
   task,
   maxSubtasksPerTask,
+  isTaskLocked,
   onToggleSubtask,
   onAddSubtask,
   onEditTask,
@@ -210,6 +226,8 @@ function TaskCard({
   const colors = colorStyles.classes;
   const subtasks = task.subtasks || [];
   const subtaskLimitReached = !withinLimit(subtasks.length, maxSubtasksPerTask);
+  // Per-subtask locking: subtasks at index >= maxSubtasksPerTask are over the plan limit
+  const subtaskOverLimitFrom = maxSubtasksPerTask ?? Infinity;
   const completedCount = subtasks.filter(s => s.completed).length;
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -251,12 +269,22 @@ function TaskCard({
               </div>
             </div>
           </div>
-          <button
-            onClick={() => onEditTask(task)}
-            className="flex-shrink-0 p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
-          >
-            <EditIcon className="h-4 w-4" />
-          </button>
+          {isTaskLocked ? (
+            <Link
+              href="/pricing"
+              title="Upgrade to edit"
+              className="flex-shrink-0 p-1.5 rounded-lg text-warning/60 hover:text-warning hover:bg-warning/10 transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            </Link>
+          ) : (
+            <button
+              onClick={() => onEditTask(task)}
+              className="flex-shrink-0 p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+            >
+              <EditIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
         <div className="mt-3 flex items-center gap-3">
           <div className="flex-1 h-2 bg-bg-tertiary rounded-full overflow-hidden">
@@ -285,6 +313,7 @@ function TaskCard({
                   index={index}
                   colorClass={colors.progress}
                   colorStyle={colorStyles.progressColor}
+                  isLocked={isTaskLocked || index >= subtaskOverLimitFrom}
                   onToggle={(e) => { e.stopPropagation(); onToggleSubtask(task.id, subtask.id); }}
                   onClick={() => onEditSubtask(task, subtask)}
                   onDelete={(e) => { e.stopPropagation(); onDeleteSubtask(task.id, subtask.id); }}
@@ -477,7 +506,7 @@ export default function BoardsPage() {
   const projectId = params.id as string;
   const columnsKey = `kanban-columns-${projectId}`;
 
-  const { state, toggleSubtask, updateSubtask, deleteSubtask, reorderSubtasks, updateTask, openForm } = useGantt();
+  const { state, toggleSubtask, updateSubtask, deleteSubtask, reorderSubtasks, updateTask, openForm, isReadOnly, lockedTaskIds } = useGantt();
   const { limits } = usePlan();
 
   const [columns, setColumns] = useState<Column[]>(DEFAULT_COLUMNS);
@@ -567,6 +596,13 @@ export default function BoardsPage() {
         <div className="mb-6">
           <h1 className="text-xl font-bold text-text-primary">Board</h1>
           <p className="text-sm text-text-tertiary mt-1">Manage your tasks and subtasks</p>
+          {isReadOnly && (
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-warning/40 bg-warning/10 px-4 py-2.5 text-sm text-warning">
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+              <span className="flex-1">This project is over your plan limit — read-only. Tasks and subtasks can only be deleted.</span>
+              <Link href="/pricing" className="font-semibold underline hover:no-underline whitespace-nowrap">Upgrade →</Link>
+            </div>
+          )}
         </div>
 
         {state.tasks.length === 0 ? (
@@ -624,9 +660,10 @@ export default function BoardsPage() {
                         key={task.id}
                         task={task}
                         maxSubtasksPerTask={limits.maxSubtasksPerTask}
+                        isTaskLocked={isReadOnly || lockedTaskIds.has(task.id)}
                         onToggleSubtask={toggleSubtask}
-                        onAddSubtask={(t) => setSubtaskModal({ task: t })}
-                        onEditTask={openForm}
+                        onAddSubtask={(t) => !isReadOnly && !lockedTaskIds.has(t.id) && setSubtaskModal({ task: t })}
+                        onEditTask={(t) => { if (!isReadOnly && !lockedTaskIds.has(t.id)) openForm(t); }}
                         onEditSubtask={(t, s) => setSubtaskModal({ task: t, subtask: s })}
                         onDeleteSubtask={deleteSubtask}
                         onReorderSubtasks={reorderSubtasks}
