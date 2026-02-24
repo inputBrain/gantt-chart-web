@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from 'react';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { ProjectsProvider } from '@/context/ProjectsContext';
+import { PlanProvider } from '@/context/PlanContext';
 import { TeamsProvider, useTeams } from '@/context/TeamsContext';
 import { Header } from '@/components/layout';
 
@@ -35,14 +36,16 @@ function ConditionalHeader() {
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
-      <TeamsProvider>
-        <TeamsThemeBridge>
-          <ProjectsProvider>
-            <ConditionalHeader />
-            {children}
-          </ProjectsProvider>
-        </TeamsThemeBridge>
-      </TeamsProvider>
+      <PlanProvider>
+        <TeamsProvider>
+          <TeamsThemeBridge>
+            <ProjectsProvider>
+              <ConditionalHeader />
+              {children}
+            </ProjectsProvider>
+          </TeamsThemeBridge>
+        </TeamsProvider>
+      </PlanProvider>
     </ThemeProvider>
   );
 }

@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useProjects } from '@/context/ProjectsContext';
 import { Project, ProjectColor } from '@/types/gantt';
 import { storageGet, storageRemove, STORAGE_KEYS } from '@/lib/storage';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Button } from '@/components/ui/Button';
+import { PlanLimitAlert } from '@/components/ui/PlanLimitAlert';
+import { usePlan } from '@/context/PlanContext';
+import { withinLimit } from '@/lib/plans';
 
 function CloseIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>;
@@ -123,9 +127,11 @@ function ColorPicker({ value, onChange, activeCustom = false }: { value: Project
 
 // ─── New Project Modal ────────────────────────────────────────
 
-function NewProjectModal({ onClose, onCreate }: {
+function NewProjectModal({ onClose, onCreate, limitReached, maxProjects }: {
   onClose: () => void;
   onCreate: (name: string, desc: string, color: ProjectColor, customColor?: string) => void;
+  limitReached: boolean;
+  maxProjects: number | null;
 }) {
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
@@ -143,9 +149,12 @@ function NewProjectModal({ onClose, onCreate }: {
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close" className="!p-1"><CloseIcon /></Button>
         </div>
         <div className="p-6 space-y-4">
+          {limitReached && (
+            <PlanLimitAlert message={`You've reached the ${maxProjects}-project limit on this plan.`} />
+          )}
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">Project name</label>
-            <input autoFocus type="text" placeholder="e.g. Website Redesign" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} className={inputCls} />
+            <input autoFocus type="text" placeholder="e.g. Website Redesign" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && !limitReached && submit()} className={inputCls} />
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-tertiary">Description <span className="normal-case font-normal text-text-quaternary">(optional)</span></label>
@@ -174,7 +183,7 @@ function NewProjectModal({ onClose, onCreate }: {
           </div>
           <div className="grid grid-cols-2 gap-3 mt-6">
             <Button variant="secondary" onClick={onClose}>Cancel</Button>
-            <Button variant="primary" onClick={submit} disabled={!name.trim()}>Create Project</Button>
+            <Button variant="primary" onClick={submit} disabled={!name.trim() || limitReached}>Create Project</Button>
           </div>
         </div>
       </div>
@@ -396,6 +405,8 @@ function ProjectCard({ project, stats, onClick, onEdit, onDragStart, onDragOver,
 export default function ProjectsPage() {
   const router = useRouter();
   const { projects, addProject, updateProject, deleteProject, reorderProjects } = useProjects();
+  const { limits } = usePlan();
+  const projectLimitReached = !withinLimit(projects.length, limits.maxProjects);
   const [statsMap, setStatsMap] = useState<Record<string, ProjectStats>>({});
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -478,13 +489,25 @@ export default function ProjectsPage() {
               {projects.length} {projects.length === 1 ? 'project' : 'projects'} · {doneTasks} / {totalTasks} tasks done
             </p>
           </div>
-          <button
-            onClick={() => setShowNew(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-accent-text text-sm font-semibold hover:bg-accent-hover transition-colors"
-          >
-            <PlusIcon />
-            New Project
-          </button>
+          {projectLimitReached ? (
+            <Link
+              href="/pricing"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-warning/40 bg-warning/10 text-warning text-sm font-semibold hover:bg-warning/20 transition-colors"
+            >
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Upgrade your plan to add projects
+            </Link>
+          ) : (
+            <button
+              onClick={() => setShowNew(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-accent-text text-sm font-semibold hover:bg-accent-hover transition-colors"
+            >
+              <PlusIcon />
+              New Project
+            </button>
+          )}
         </div>
 
         {/* Summary stats */}
@@ -518,21 +541,40 @@ export default function ProjectsPage() {
               isDragOver={dragOverIndex === index}
             />
           ))}
-          <button
-            onClick={() => setShowNew(true)}
-            className="border-2 border-dashed border-border-secondary rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-text-quaternary hover:text-text-tertiary hover:border-border-primary transition-all min-h-[200px]"
-          >
-            <div className="h-10 w-10 rounded-full border-2 border-dashed border-current flex items-center justify-center">
-              <PlusIcon />
-            </div>
-            <span className="text-sm">New Project</span>
-          </button>
+          {projectLimitReached ? (
+            <Link
+              href="/pricing"
+              className="border-2 border-dashed border-warning/40 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-warning/70 hover:text-warning hover:border-warning/60 transition-all min-h-[200px]"
+            >
+              <div className="h-10 w-10 rounded-full border-2 border-dashed border-current flex items-center justify-center">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium">Upgrade your plan</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => setShowNew(true)}
+              className="border-2 border-dashed border-border-secondary rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-text-quaternary hover:text-text-tertiary hover:border-border-primary transition-all min-h-[200px]"
+            >
+              <div className="h-10 w-10 rounded-full border-2 border-dashed border-current flex items-center justify-center">
+                <PlusIcon />
+              </div>
+              <span className="text-sm">New Project</span>
+            </button>
+          )}
         </div>
 
       </div>
 
       {showNew && (
-        <NewProjectModal onClose={() => setShowNew(false)} onCreate={handleCreate} />
+        <NewProjectModal
+          onClose={() => setShowNew(false)}
+          onCreate={handleCreate}
+          limitReached={projectLimitReached}
+          maxProjects={limits.maxProjects}
+        />
       )}
       {editing && (
         <EditProjectModal

@@ -6,7 +6,11 @@ import { TaskColor, TASK_COLORS, Task } from '@/types/gantt';
 import { formatDate, parseDate } from '@/utils/dateUtils';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { PlanLimitAlert } from '@/components/ui/PlanLimitAlert';
+import { usePlan } from '@/context/PlanContext';
+import { withinLimit } from '@/lib/plans';
 
 const COLORS: TaskColor[] = ['blue', 'green', 'purple', 'orange', 'red', 'teal', 'pink', 'yellow'];
 
@@ -31,7 +35,10 @@ function getDefaultDates() {
 
 function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tasks: Task[] }) {
   const { addTask, updateTask, deleteTask, closeForm } = useGantt();
+  const { limits } = usePlan();
   const colorPickerRef = useRef<HTMLInputElement>(null);
+
+  const taskLimitReached = !editingTask && !withinLimit(tasks.length, limits.maxTasksPerProject);
 
   const defaultDates = useMemo(() => getDefaultDates(), []);
 
@@ -142,6 +149,13 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
+          {taskLimitReached && (
+            <div className="mb-4">
+              <PlanLimitAlert
+                message={`You've reached the ${limits.maxTasksPerProject}-task limit on this plan.`}
+              />
+            </div>
+          )}
           <div className="space-y-4">
             {/* Task Name */}
             <div>
@@ -321,9 +335,21 @@ function TaskFormContent({ editingTask, tasks }: { editingTask: Task | null; tas
               <Button variant="secondary" onClick={closeForm}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary">
-                {editingTask ? 'Save Changes' : 'Create Task'}
-              </Button>
+              {taskLimitReached ? (
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-warning/10 border border-warning/40 px-4 py-2.5 text-xs font-semibold text-warning hover:bg-warning/20 transition-colors"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  Upgrade your plan
+                </Link>
+              ) : (
+                <Button type="submit" variant="primary">
+                  {editingTask ? 'Save Changes' : 'Create Task'}
+                </Button>
+              )}
             </div>
             {editingTask && (
               <Button variant="danger" fullWidth onClick={handleDelete}>

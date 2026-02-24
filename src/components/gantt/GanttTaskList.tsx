@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useGantt } from '@/context/GanttContext';
 import { TASK_COLORS, Task, getTaskColorStyles } from '@/types/gantt';
 import { formatDateShort, calculateTaskProgress } from '@/utils/dateUtils';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Button } from '@/components/ui/Button';
+import { usePlan } from '@/context/PlanContext';
+import { withinLimit } from '@/lib/plans';
 
 // Icons
 function ChevronIcon({ className, expanded }: { className?: string; expanded?: boolean }) {
@@ -66,8 +69,11 @@ function DocumentIcon({ className }: { className?: string }) {
 
 export function GanttTaskList() {
   const { state, selectTask, openForm, deleteTask } = useGantt();
+  const { limits } = usePlan();
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+
+  const taskLimitReached = !withinLimit(state.tasks.length, limits.maxTasksPerProject);
 
   const toggleExpand = (taskId: string) => {
     setExpandedTasks((prev) => {
@@ -98,12 +104,24 @@ export function GanttTaskList() {
             </span>
           )}
         </div>
-        <Button variant="primary" size="sm" onClick={() => openForm()} className="flex items-center gap-1.5 !rounded-lg !px-5">
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          New
-        </Button>
+        {taskLimitReached ? (
+          <Link
+            href="/pricing"
+            className="flex items-center gap-1.5 rounded-lg border border-warning/40 bg-warning/10 px-4 py-1.5 text-xs font-semibold text-warning hover:bg-warning/20 transition-colors"
+          >
+            <svg className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            Upgrade
+          </Link>
+        ) : (
+          <Button variant="primary" size="sm" onClick={() => openForm()} className="flex items-center gap-1.5 !rounded-lg !px-5">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            New
+          </Button>
+        )}
       </div>
 
       {/* Task List */}

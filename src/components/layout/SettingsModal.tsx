@@ -1,6 +1,8 @@
 'use client';
 
 import { useTheme, THEMES, TEAMS_THEMES, Theme } from '@/context/ThemeContext';
+import { usePlan } from '@/context/PlanContext';
+import { ALL_PLAN_TIERS, PLAN_NAMES, PLAN_LIMITS } from '@/lib/plans';
 import { Button } from '@/components/ui/Button';
 
 interface SettingsModalProps {
@@ -21,8 +23,13 @@ const LIGHT_THEMES = THEMES.filter(t => !t.id.startsWith('dark-'));
 // Dark themes from THEMES
 const DARK_THEMES = THEMES.filter(t => t.id.startsWith('dark-'));
 
+function formatLimit(v: number | null) {
+  return v === null ? 'Unlimited' : String(v);
+}
+
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
+  const { plan, setPlan } = usePlan();
 
   if (!isOpen) return null;
 
@@ -72,6 +79,34 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Plan Section */}
+        <div className="mt-5 space-y-3">
+          <label className="text-sm font-medium text-text-secondary">Plan</label>
+          <div className="grid grid-cols-3 gap-2">
+            {ALL_PLAN_TIERS.map((tier) => {
+              const lim = PLAN_LIMITS[tier];
+              const isActive = plan === tier;
+              return (
+                <button
+                  key={tier}
+                  onClick={() => setPlan(tier)}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg p-2.5 text-left transition-all ${
+                    isActive ? 'bg-bg-hover ring-2 ring-accent' : 'bg-bg-secondary hover:bg-bg-hover'
+                  }`}
+                >
+                  <span className={`text-xs font-semibold ${isActive ? 'text-accent' : 'text-text-primary'}`}>
+                    {PLAN_NAMES[tier]}
+                  </span>
+                  <span className="text-[10px] text-text-tertiary leading-tight">
+                    {formatLimit(lim.maxProjects)} proj · {formatLimit(lim.maxTasksPerProject)} tasks
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-text-quaternary">Demo only — simulates plan restrictions.</p>
         </div>
 
         {/* Dark Themes Section */}

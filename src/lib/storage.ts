@@ -33,6 +33,7 @@ export function storageRemove(key: string): void {
 export const STORAGE_KEYS = {
   projects: 'planify-projects',
   theme: 'theme',
+  plan: 'planify-plan',
   tasks: (projectId: string) => `planify-tasks-${projectId}`,
   kanban: (projectId: string) => `kanban-columns-${projectId}`,
   /** @deprecated Migrate to tasks(projectId) */

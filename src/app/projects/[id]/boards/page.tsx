@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useGantt } from '@/context/GanttContext';
+import { usePlan } from '@/context/PlanContext';
+import { withinLimit } from '@/lib/plans';
 import { TASK_COLORS, Task, Subtask, getTaskColorStyles } from '@/types/gantt';
 import { TaskForm } from '@/components/gantt/TaskForm';
 import { calculateTaskProgress, formatDateShort } from '@/utils/dateUtils';
@@ -182,6 +185,7 @@ function SubtaskItem({
 
 interface TaskCardProps {
   task: Task;
+  maxSubtasksPerTask: number | null;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onAddSubtask: (task: Task) => void;
   onEditTask: (task: Task) => void;
@@ -192,6 +196,7 @@ interface TaskCardProps {
 
 function TaskCard({
   task,
+  maxSubtasksPerTask,
   onToggleSubtask,
   onAddSubtask,
   onEditTask,
@@ -204,6 +209,7 @@ function TaskCard({
   const colorStyles = getTaskColorStyles(task);
   const colors = colorStyles.classes;
   const subtasks = task.subtasks || [];
+  const subtaskLimitReached = !withinLimit(subtasks.length, maxSubtasksPerTask);
   const completedCount = subtasks.filter(s => s.completed).length;
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -295,13 +301,25 @@ function TaskCard({
             <p className="text-xs text-text-tertiary mb-2">No subtasks yet</p>
           </div>
         )}
-        <button
-          onClick={() => onAddSubtask(task)}
-          className="w-full mt-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-border-secondary text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
-        >
-          <PlusIcon className="h-4 w-4" />
-          <span className="text-xs font-medium">Add subtask</span>
-        </button>
+        {subtaskLimitReached ? (
+          <div className="w-full mt-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-warning/30 bg-warning/10 text-warning">
+            <svg className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <span className="text-xs font-medium">
+              Limit reached ·{' '}
+              <Link href="/pricing" className="underline hover:no-underline">Upgrade</Link>
+            </span>
+          </div>
+        ) : (
+          <button
+            onClick={() => onAddSubtask(task)}
+            className="w-full mt-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-border-secondary text-text-tertiary hover:text-accent hover:border-accent hover:bg-accent-light transition-colors"
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span className="text-xs font-medium">Add subtask</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -460,6 +478,7 @@ export default function BoardsPage() {
   const columnsKey = `kanban-columns-${projectId}`;
 
   const { state, toggleSubtask, updateSubtask, deleteSubtask, reorderSubtasks, updateTask, openForm } = useGantt();
+  const { limits } = usePlan();
 
   const [columns, setColumns] = useState<Column[]>(DEFAULT_COLUMNS);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -604,6 +623,7 @@ export default function BoardsPage() {
                       <TaskCard
                         key={task.id}
                         task={task}
+                        maxSubtasksPerTask={limits.maxSubtasksPerTask}
                         onToggleSubtask={toggleSubtask}
                         onAddSubtask={(t) => setSubtaskModal({ task: t })}
                         onEditTask={openForm}
