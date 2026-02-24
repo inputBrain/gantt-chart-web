@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // ─── Icons ────────────────────────────────────────────────────
 
@@ -23,12 +23,15 @@ function CrownIcon({ className }: { className?: string }) {
 // ─── Plan data ────────────────────────────────────────────────
 
 type PlanColor = 'neutral' | 'success' | 'accent' | 'purple';
+type Currency = 'usd' | 'uah';
 
 type Plan = {
   id: string;
   name: string;
   price: number;
   yearlyPrice: number;
+  uahPrice: number;
+  uahYearlyPrice: number;
   priceLabel: string | null;
   popular: boolean;
   color: PlanColor;
@@ -39,7 +42,7 @@ type Plan = {
 
 const PLANS_SOLO: Plan[] = [
   {
-    id: 'free', name: 'Free', price: 0, yearlyPrice: 0, priceLabel: null,
+    id: 'free', name: 'Free', price: 0, yearlyPrice: 0, uahPrice: 0, uahYearlyPrice: 0, priceLabel: null,
     popular: false, color: 'neutral', inherits: null,
     features: [
       '1 Editor · Unlimited Viewers',
@@ -51,7 +54,7 @@ const PLANS_SOLO: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, priceLabel: null,
+    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, uahPrice: 1000, uahYearlyPrice: 800, priceLabel: null,
     popular: false, color: 'success', inherits: null,
     features: [
       '1 Editor · Unlimited Viewers',
@@ -64,7 +67,7 @@ const PLANS_SOLO: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'pro', name: 'Pro', price: 25, yearlyPrice: 20, priceLabel: null,
+    id: 'pro', name: 'Pro', price: 25, yearlyPrice: 20, uahPrice: 2100, uahYearlyPrice: 1680, priceLabel: null,
     popular: true, color: 'accent', inherits: 'Starter',
     features: [
       'Task dependencies & critical path',
@@ -76,7 +79,7 @@ const PLANS_SOLO: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'business', name: 'Business', price: 45, yearlyPrice: 36, priceLabel: null,
+    id: 'business', name: 'Business', price: 45, yearlyPrice: 36, uahPrice: 3800, uahYearlyPrice: 3040, priceLabel: null,
     popular: false, color: 'purple', inherits: 'Pro',
     features: [
       'Advanced analytics & reports',
@@ -90,7 +93,7 @@ const PLANS_SOLO: Plan[] = [
 
 const PLANS_TEAM: Plan[] = [
   {
-    id: 'free', name: 'Free', price: 0, yearlyPrice: 0, priceLabel: null,
+    id: 'free', name: 'Free', price: 0, yearlyPrice: 0, uahPrice: 0, uahYearlyPrice: 0, priceLabel: null,
     popular: false, color: 'neutral', inherits: null,
     features: [
       '1 Editor · Unlimited Viewers',
@@ -102,7 +105,7 @@ const PLANS_TEAM: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, priceLabel: 'per editor / month',
+    id: 'starter', name: 'Starter', price: 12, yearlyPrice: 9.6, uahPrice: 1000, uahYearlyPrice: 800, priceLabel: 'per editor / month',
     popular: false, color: 'success', inherits: null,
     features: [
       'Up to 3 Editors · Unlimited Viewers',
@@ -115,7 +118,7 @@ const PLANS_TEAM: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'team', name: 'Team', price: 50, yearlyPrice: 40, priceLabel: 'per editor / month',
+    id: 'team', name: 'Team', price: 50, yearlyPrice: 40, uahPrice: 4200, uahYearlyPrice: 3360, priceLabel: 'per editor / month',
     popular: true, color: 'accent', inherits: 'Starter',
     features: [
       'Up to 10 Editors',
@@ -128,7 +131,7 @@ const PLANS_TEAM: Plan[] = [
     cta: 'Get Started',
   },
   {
-    id: 'enterprise', name: 'Enterprise', price: 100, yearlyPrice: 80, priceLabel: 'per editor / month',
+    id: 'enterprise', name: 'Enterprise', price: 100, yearlyPrice: 80, uahPrice: 8400, uahYearlyPrice: 6720, priceLabel: 'per editor / month',
     popular: false, color: 'purple', inherits: 'Team',
     features: [
       'Unlimited Editors',
@@ -183,10 +186,15 @@ const COLOR_MAP: Record<PlanColor, {
 
 // ─── Plan card ────────────────────────────────────────────────
 
-function PlanCard({ plan, annual }: { plan: Plan; annual: boolean }) {
+function PlanCard({ plan, annual, currency }: { plan: Plan; annual: boolean; currency: Currency }) {
   const c = COLOR_MAP[plan.color];
   const isAccent = plan.color === 'accent';
-  const displayPrice = annual ? Math.round(plan.yearlyPrice * 12) : plan.price;
+  const isUah = currency === 'uah';
+
+  const rawMonthly = isUah ? plan.uahPrice : plan.price;
+  const rawYearly  = isUah ? plan.uahYearlyPrice : plan.yearlyPrice;
+  const displayPrice = annual ? Math.round(rawYearly * 12) : rawMonthly;
+  const symbol = isUah ? '₴' : '$';
   const priceUnit = annual ? '/year + tax' : '/month + tax';
 
   return (
@@ -205,13 +213,13 @@ function PlanCard({ plan, annual }: { plan: Plan; annual: boolean }) {
 
       {/* Price */}
       <div className="mt-3">
-        {plan.price === 0 ? (
+        {rawMonthly === 0 ? (
           <span className="text-4xl font-bold text-text-primary">Free</span>
         ) : (
           <>
             <div className="flex items-baseline gap-1">
               <span className={`text-4xl font-bold transition-colors ${isAccent ? c.priceClass : `text-text-primary ${c.priceClass}`}`}>
-                ${displayPrice}
+                {symbol}{displayPrice}
               </span>
               <span className="text-text-tertiary text-sm">{priceUnit}</span>
             </div>
@@ -254,7 +262,17 @@ function PlanCard({ plan, annual }: { plan: Plan; annual: boolean }) {
 export default function PricingPage() {
   const [mode, setMode] = useState<'solo' | 'team'>('solo');
   const [annual, setAnnual] = useState(false);
+  const [currency, setCurrency] = useState<Currency>('usd');
   const plans = mode === 'solo' ? PLANS_SOLO : PLANS_TEAM;
+
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then((data: { country_code?: string }) => {
+        if (data.country_code === 'UA') setCurrency('uah');
+      })
+      .catch(() => {});
+  }, []);
 
   const pill = (active: boolean) =>
     `px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-accent text-accent-text shadow-sm' : 'text-text-tertiary hover:text-text-secondary'}`;
@@ -265,15 +283,19 @@ export default function PricingPage() {
 
         {/* Hero */}
         <div className="relative text-center mb-10 py-14 rounded-3xl overflow-hidden">
-          {/* Gradient top-left → bottom-right: основний */}
           <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.15] via-accent/[0.05] to-transparent pointer-events-none" />
-          {/* Gradient bottom-right → top-left: контр-акцент для глибини */}
           <div className="absolute inset-0 bg-gradient-to-tl from-accent/[0.09] to-transparent pointer-events-none" />
 
           <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3 relative">Pricing</p>
           <h1 className="text-4xl font-bold text-text-primary relative">Simple, transparent pricing</h1>
           <p className="text-text-secondary mt-4 text-base max-w-md mx-auto relative">
             Start free. No credit card required. Upgrade when you&apos;re ready.
+          </p>
+          <p className="text-text-tertiary mt-2 text-sm relative">
+            Licenses can be used in{' '}
+            <span className="font-medium text-text-secondary">Microsoft Teams</span>,{' '}
+            <span className="font-medium text-text-secondary">Excel</span> and{' '}
+            <span className="font-medium text-text-secondary">PowerPoint</span>.
           </p>
           <div className="flex items-center justify-center gap-6 mt-5 relative">
             {['No credit card', 'Cancel anytime', 'Free plan forever'].map(t => (
@@ -287,7 +309,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Controls — L3 Split */}
+        {/* Controls */}
         <div className="flex items-center justify-between mb-10">
           <div className="inline-flex rounded-2xl bg-bg-tertiary p-1.5 gap-1">
             <button onClick={() => setMode('solo')} className={pill(mode === 'solo')}>Solo</button>
@@ -307,13 +329,15 @@ export default function PricingPage() {
         {/* Cards */}
         <div className="grid grid-cols-4 gap-8">
           {plans.map(plan => (
-            <PlanCard key={plan.id} plan={plan} annual={annual} />
+            <PlanCard key={plan.id} plan={plan} annual={annual} currency={currency} />
           ))}
         </div>
 
         {/* Footer note */}
         <p className="text-center text-xs text-text-tertiary mt-8">
-          All prices in USD. Tax may apply depending on your location.
+          {currency === 'uah'
+            ? 'Всі ціни у гривнях (₴). Ціни можуть відрізнятися залежно від регіону.'
+            : 'All prices in USD. Tax may apply depending on your location.'}
           <br />
           Annual plans are billed once per year. You can cancel at any time.
         </p>
